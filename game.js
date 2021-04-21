@@ -25,6 +25,7 @@ class Player extends Phaser.GameObjects.Image {
 				this.x = this.targetX;
 				this.y = this.targetY;
 				this.moving = false;
+				this.scene.sound.play("ding");
 			} else {
 				this.x += Math.cos(this.movingAngle) * d;
 				this.y += Math.sin(this.movingAngle) * d;

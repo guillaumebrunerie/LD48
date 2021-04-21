@@ -22,6 +22,9 @@ class MainScene extends Phaser.Scene {
 	preload() {
 		this.load.setPath("assets");
 		this.load.image(["background", "player"]);
+
+		this.load.setPath("audio");
+		this.load.audio("ding", "PP_Collect_Coin_1_1.wav");
 	}
 
 	create() {
