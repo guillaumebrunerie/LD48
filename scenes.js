@@ -26,7 +26,7 @@ class MainScene extends Phaser.Scene {
 		this.load.setPath("audio");
 		this.load.audio("ding", "PP_Collect_Coin_1_1.wav");
 
-		this.load.setPath("export");
+		this.load.setPath("spineboy");
 		this.load.spine("spineboy", 'spineboy-pro.json', [ 'spineboy.atlas' ], false);
 	}
 
