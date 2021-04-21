@@ -27,7 +27,7 @@ class MainScene extends Phaser.Scene {
 		this.load.audio("ding", "PP_Collect_Coin_1_1.wav");
 
 		this.load.setPath("export");
-		this.load.spine("spineboy", 'spineboy-pro.json', [ 'spineboy.atlas' ], true);
+		this.load.spine("spineboy", 'spineboy-pro.json', [ 'spineboy.atlas' ], false);
 	}
 
 	create() {
@@ -36,7 +36,7 @@ class MainScene extends Phaser.Scene {
 
 		// Player
 		this.player = this.add.player(1500, 800);
-		this.input.on("pointermove", (e) => {if (e.buttons%2) this.player.moveTo(e.position);});
+		// this.input.on("pointermove", (e) => {if (e.buttons%2) this.player.moveTo(e.position);});
 		this.input.on("pointerdown", (e) => {if (e.buttons%2) this.player.moveTo(e.position);});
 		// this.input.on("pointerdown", () => {this.scene.start("GameOverScene");});
 
@@ -45,9 +45,16 @@ class MainScene extends Phaser.Scene {
 		for (let i = 0; i < 5; i++)
 			this.enemies.push(this.add.enemy(0, 0));
 
-		const man = this.add.spine(512, 650, 'spineboy', "idle", true);
+		this.man = this.add.spine(512, 900, 'spineboy', "hoverboard", true);
+		this.man.addAnimation(1, "aim", true);
 		const container = this.add.spineContainer();
-		container.add(man);
+		container.add(this.man);
+
+		this.input.on("pointermove", (e) => {
+			let bone = this.man.findBone("crosshair");
+			bone.x = e.position.x - this.man.x;
+			bone.y = this.man.y - e.position.y;
+		});
 	}
 
 	update(time, delta) {
