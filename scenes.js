@@ -25,6 +25,9 @@ class MainScene extends Phaser.Scene {
 
 		this.load.setPath("audio");
 		this.load.audio("ding", "PP_Collect_Coin_1_1.wav");
+
+		this.load.setPath("export");
+		this.load.spine("spineboy", 'spineboy-pro.json', [ 'spineboy.atlas' ], true);
 	}
 
 	create() {
@@ -41,6 +44,10 @@ class MainScene extends Phaser.Scene {
 		this.enemies = [];
 		for (let i = 0; i < 5; i++)
 			this.enemies.push(this.add.enemy(0, 0));
+
+		const man = this.add.spine(512, 650, 'spineboy', "idle", true);
+		const container = this.add.spineContainer();
+		container.add(man);
 	}
 
 	update(time, delta) {
