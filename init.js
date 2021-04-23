@@ -1,11 +1,10 @@
 new Phaser.Game({
 	type: Phaser.AUTO,
-	width: 1600,
-	height: 900,
-	plugins: {
-		scene: [
-			{ key: 'SpinePlugin', plugin: window.SpinePlugin, mapping: 'spine' }
-		]
+	scale: {
+		autoCenter: Phaser.Scale.CENTER_BOTH,
+		mode: Phaser.Scale.FIT,
+		width: 1600,
+		height: 900,
 	},
-	scene: [MainScene, GameOverScene],
+	scene: [MainScene],
 });

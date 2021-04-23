@@ -42,11 +42,13 @@ class Enemy extends Phaser.GameObjects.Image {
 	constructor(scene, x, y) {
 		super(scene, x, y, "player");
 
-		this.speed = 0.5;
+		this.speed = 0.2;
 		this.movingAngle = 0;
 		this.targetX = x;
 		this.targetY = y;
 		this.scale = 0.3;
+
+		this.setInteractive();
 	}
 
 	moveToNewPlace() {
