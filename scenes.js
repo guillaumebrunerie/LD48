@@ -1,3 +1,5 @@
+// Driftings things consist of obstacles and power ups
+
 class DriftingThing extends Phaser.GameObjects.Sprite {
 	constructor(scene, conf) {
 		super(scene, Math.random() * scene.scale.width, scene.scale.height, conf.name);
@@ -29,13 +31,15 @@ class PowerUp extends DriftingThing {
 	}
 }
 
-class Player extends Phaser.GameObjects.Container {
+// The robot
+
+class Robot extends Phaser.GameObjects.Container {
 	constructor (scene) {
 		super(scene, 450, 50);
 
-		let player = scene.add.sprite(0, 0, "player");
-		this.add(player);
-		player.scale = 0.4;
+		let robot = scene.add.sprite(0, 0, "player");
+		this.add(robot);
+		robot.scale = 0.4;
 
 		this.beam = scene.add.sprite(0, 0, "player");
 		this.beam.setOrigin(0.5, 0);
@@ -52,10 +56,10 @@ class Player extends Phaser.GameObjects.Container {
 		this.add(this.beam2);
 
 		// Track where the robot is
-		this.centerY = conf.playerY - conf.playerRadius;
-		this.radius = conf.playerRadius;
+		this.centerY = conf.robotY - conf.robotRadius;
+		this.radius = conf.robotRadius;
 		this.angleMax = conf.angleMax;
-		this.speed = conf.playerSpeed;
+		this.speed = conf.robotSpeed;
 
 		// The beam
 		this.beamAngle = conf.beamAngle;
@@ -83,7 +87,7 @@ class Player extends Phaser.GameObjects.Container {
 
 		let angle = easedPosition * this.angleMax;
 		this.y = this.centerY + this.radius * Math.cos(angle);
-		this.x = 450 + this.radius * Math.sin(angle);
+		this.x = this.scene.scale.width/2 + this.radius * Math.sin(angle);
 		this.rotation = -angle;
 
 		if (this.charging) {
@@ -166,8 +170,9 @@ class MainScene extends Phaser.Scene {
 	preload() {
 		this.load.setPath("assets");
 		this.load.image("player");
-		this.load.image("astronaut", "Astronaut/Astronaut.png");
-		this.load.image("bg", "Bg/Bg.jpg");
+		this.load.image("Astronaut", "Astronaut/Astronaut.png");
+		this.load.image("ShieldBubble", "Fx/ShieldBubble.png");
+		this.load.image("Bg", "Bg/Bg.jpg");
 
 		conf.obstacles.forEach(o => {
 			this.load.image(o.name, `Obstacles/Obstacle_${o.name}.png`);
@@ -182,16 +187,17 @@ class MainScene extends Phaser.Scene {
 	}
 
 	create() {
-		this.add.image(0, 0, "bg").setOrigin(0, 0);
-		this.add.image(this.scale.width / 2, 0, "astronaut").setOrigin(0.5, 0);
+		this.add.image(0, 0, "Bg").setOrigin(0, 0);
+		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
+		this.add.image(this.scale.width / 2, conf.astronautY, "ShieldBubble");
 
 		this.obstacles = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.powerUps = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
 		this.claws = this.add.group({runChildUpdate: true, maxSize: 1});
 
-		this.player = new Player(this);
-		this.add.existing(this.player);
+		this.robot = new Robot(this);
+		this.add.existing(this.robot);
 
 		this.lastCreatedPowerUp = this.time.now;
 		this.lastCreatedObstacle = -Infinity;
@@ -217,7 +223,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	move(e) {
-		if (!this.player.charging)
+		if (!this.robot.charging)
 			return;
 
 		// if (e == "claw" || (e !== "default" && e.position.x < this.scale.width / 2)) {
@@ -232,16 +238,16 @@ class MainScene extends Phaser.Scene {
 	down(e) {
 		if (this.time.now < this.lastFired + conf.reloadDelay * 1000)
 			return;
-		this.player.down();
+		this.robot.down();
 		this.move(e);
 	}
 
 	up(e) {
-		if (!this.player.charging)
+		if (!this.robot.charging)
 			return;
 		this.lastFired = this.time.now;
 		let weapon = e.position ? (e.position.x < this.scale.width / 2 ? "claw" : "default") : e;
-		this.player.up(weapon);
+		this.robot.up(weapon);
 		// this.uileft.alpha = 0.5;
 		// this.uiright.alpha = 0.5;
 	}
@@ -277,7 +283,7 @@ class MainScene extends Phaser.Scene {
 			this.lastCreatedPowerUp = time;
 		}
 
-		this.player.update(delta);
+		this.robot.update(delta);
 	}
 
 	fire(x, y, angle, weapon) {

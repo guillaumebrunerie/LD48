@@ -1,10 +1,13 @@
 conf = {};
 
+// The astronaut
+conf.astronautY = 220;
+
 // The robot
-conf.playerSpeed = 0.001;
+conf.robotSpeed = 0.001;
 conf.angleMax = 0.3;
-conf.playerY = 400;
-conf.playerRadius = 1000;
+conf.robotY = 500;
+conf.robotRadius = 1000;
 
 // Shooting beam
 conf.beamAngle = 0.3;
