@@ -37,11 +37,29 @@ class Obstacle extends DriftingThing {
 	constructor(scene) {
 		super(scene, pick(conf.obstacles));
 	}
+
+	collect() {
+		this.scene.loseLife();
+	}
 }
 
 class PowerUp extends DriftingThing {
 	constructor(scene) {
 		super(scene, pick(conf.powerUps));
+	}
+
+	collect() {
+		switch (this.type) {
+			case "Laser":
+				break;
+			case "Magnet":
+				break;
+			case "Shield":
+				this.scene.repairShield();
+				break;
+			case "Target":
+				break;
+		}
 	}
 }
 

@@ -3,6 +3,7 @@ class MainScene extends Phaser.Scene {
 		super("MainScene");
 
 		this.lastFired = 0;
+		this.shieldLevel = 2;
 	}
 
 	preload() {
@@ -10,7 +11,8 @@ class MainScene extends Phaser.Scene {
 		this.load.image("player");
 		this.load.image("Astronaut", "Astronaut/Astronaut.png");
 		this.load.image("Astronaut_Line", "Astronaut/Astronaut_Line.png");
-		this.load.image("ShieldBubble", "Fx/ShieldBubble.png");
+		this.load.image("Shield1", "Fx/ShieldBubble2.png");
+		this.load.image("Shield2", "Fx/ShieldBubble.png");
 		this.load.image("Bg", "Bg/Bg.jpg");
 
 		conf.obstacles.forEach(o => {
@@ -34,7 +36,7 @@ class MainScene extends Phaser.Scene {
 		this.add.image(conf.inventoryX, conf.inventoryY, "ScrewInventory");
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
 		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
-		this.add.image(this.scale.width / 2, conf.astronautY, "ShieldBubble");
+		this.shield = this.add.image(this.scale.width / 2, conf.astronautY, "Shield2");
 
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
@@ -104,6 +106,36 @@ class MainScene extends Phaser.Scene {
 		let y = conf.inventoryY + conf.screwY;
 		this.add.image(x, y, "UI_Screw");
 		this.collectedScrews++;
+	}
+
+	loseLife() {
+		this.shieldLevel--;
+		if (this.shieldLevel < 0)
+			this.shieldLevel = 0;
+		this.updateShield();
+	}
+
+	repairShield() {
+		this.shieldLevel++;
+		if (this.shieldLevel > 2)
+			this.shieldLevel = 2;
+		this.updateShield();
+	}
+
+	updateShield() {
+		switch (this.shieldLevel) {
+			case 0:
+				this.shield.visible = false;
+				break;
+			case 1:
+				this.shield.visible = true;
+				this.shield.setTexture("Shield1");
+				break;
+			case 2:
+				this.shield.visible = true;
+				this.shield.setTexture("Shield2");
+				break;
+		}
 	}
 
 	update(time, delta) {
