@@ -1,18 +1,22 @@
-function rand(min, max) {
-	return (min + Math.random() * (max - min));
-}
-
 class Obstacle extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y) {
 		super(scene, x, y, "player");
 		this.scale = 0.3;
-		this.speed = 0.05 * (Math.random() * 3 + 1);
+		this.speed = rand(conf.obstacleSpeed);
+		this.frozen = false;
 	}
 
 	update(time, delta) {
+		if (this.frozen)
+			return;
+
 		this.y -= this.speed * delta;
-		if (this.y < -10)
+		if (this.getBottomCenter().y < 0)
 			this.destroy();
+	}
+
+	freeze() {
+		this.frozen = true;
 	}
 }
 
@@ -39,23 +43,23 @@ class Player extends Phaser.GameObjects.Container {
 		this.add(this.beam2);
 
 		// Track where the robot is
-		this.centerY = -600;
-		this.radius = 1000;
-		this.angleMax = 0.3; // Radians
-		this.speed = 0.001;
+		this.centerY = conf.playerY - conf.playerRadius;
+		this.radius = conf.playerRadius;
+		this.angleMax = conf.angleMax;
+		this.speed = conf.playerSpeed;
 
 		// The beam
-		this.beamAngle = 0.4;
-		this.beamSpeed = 2.5;
+		this.beamAngle = conf.beamAngle;
+		this.beamSpeed = conf.beamSpeed;
 
 		this.position = 0; // -1 to +1
 
-		this.paused = false;
-		this.timePaused = 0;
+		this.charging = false;
+		this.timeCharging = 0;
 	}
 
 	update(delta) {
-		if (!this.paused)
+		if (!this.charging)
 			this.position += this.speed * delta;
 		if (this.position > 1) {
 			this.position = 1;
@@ -73,29 +77,29 @@ class Player extends Phaser.GameObjects.Container {
 		this.x = 450 + this.radius * Math.sin(angle);
 		this.rotation = -angle;
 
-		if (this.paused) {
-			this.timePaused += delta;
-			this.beam.rotation = Math.max(0, this.beamAngle - this.timePaused / (1000 * this.beamSpeed));
+		if (this.charging) {
+			this.timeCharging += delta;
+			this.beam.rotation = Math.max(0, this.beamAngle - this.timeCharging / (1000 * this.beamSpeed));
 			this.beam2.rotation = -this.beam.rotation;
 		}
 	}
 
-	pause() {
+	down() {
 		this.beam.visible = true;
 		this.beam2.visible = true;
-		this.paused = true;
-		this.timePaused = 0;
+		this.charging = true;
+		this.timeCharging = 0;
 	}
 
-	unpause() {
+	up(weapon) {
 		this.beam.visible = false;
 		this.beam2.visible = false;
-		this.paused = false;
+		this.charging = false;
 
-		let firingAngle = this.rotation + Math.PI/2 + this.beam.rotation * rand(-1, 1);
+		let firingAngle = this.rotation + Math.PI/2 + this.beam.rotation * rand({min: -1, max: 1});
 
-		this.scene.fire(this.x, this.y, firingAngle);
-		window.navigator.vibrate(100);
+		this.scene.fire(this.x, this.y, firingAngle, weapon);
+		window.navigator.vibrate(10);
 	}
 }
 
@@ -103,7 +107,27 @@ class Bullet extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y, angle) {
 		super(scene, x, y, "player");
 		this.scale = 0.1;
-		this.speed = 1.5 * (Math.random() * 3 + 1);
+		this.speed = rand(conf.bulletSpeed);
+		this.angle = angle;
+	}
+
+	update(time, delta) {
+		this.oldX = this.x;
+		this.oldY = this.y;
+
+		this.x += this.speed * delta * Math.cos(this.angle);
+		this.y += this.speed * delta * Math.sin(this.angle);
+
+		if (this.getTopCenter().y > this.scene.scale.height)
+			this.destroy();
+	}
+}
+
+class Claw extends Phaser.GameObjects.Sprite {
+	constructor (scene, x, y, angle) {
+		super(scene, x, y, "player");
+		this.scale = 0.2;
+		this.speed = 1 * (Math.random() * 3 + 1);
 		this.angle = angle;
 	}
 
@@ -122,6 +146,8 @@ class Bullet extends Phaser.GameObjects.Sprite {
 class MainScene extends Phaser.Scene {
 	constructor() {
 		super("MainScene");
+
+		this.lastFired = 0;
 	}
 
 	preload() {
@@ -134,8 +160,8 @@ class MainScene extends Phaser.Scene {
 
 	create() {
 		this.obstacles = this.add.group({runChildUpdate: true, maxSize: 10});
-
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
+		this.claws = this.add.group({runChildUpdate: true, maxSize: 1});
 
 		this.lastCreatedObstacle = 0;
 		this.creationRate = 2;
@@ -146,11 +172,52 @@ class MainScene extends Phaser.Scene {
 
 		let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-		spaceBar.on("down", () => this.player.pause());
-		spaceBar.on("up",   () => this.player.unpause());
+		spaceBar.on("down", () => this.down("default"));
+		spaceBar.on("up",   () => this.up("default"));
 
-		this.input.on("pointerdown", () => this.player.pause());
-		this.input.on("pointerup", () => this.player.unpause());
+		let ctrl = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+
+		ctrl.on("down", () => this.down("claw"));
+		ctrl.on("up",   () => this.up("claw"));
+
+		this.input.on("pointerdown", (e) => this.down(e));
+		this.input.on("pointerup", (e) => this.up(e));
+		this.input.on("pointermove", (e) => this.move(e));
+
+		// this.uileft  = this.add.image(this.scale.width / 4, this.scale.height, "uileft");
+		// this.uileft.setOrigin(0.5, 1);
+		// this.uiright = this.add.image(3 * this.scale.width / 4, this.scale.height, "uileft");
+		// this.uiright.setOrigin(0.5, 1);
+	}
+
+	move(e) {
+		if (!this.player.charging)
+			return;
+
+		// if (e == "claw" || (e !== "default" && e.position.x < this.scale.width / 2)) {
+		// 	this.uileft.alpha = 1;
+		// 	this.uiright.alpha = 0;
+		// } else {
+		// 	this.uileft.alpha = 0;
+		// 	this.uiright.alpha = 1;
+		// }
+	}
+
+	down(e) {
+		if (this.time.now < this.lastFired + conf.reloadDelay * 1000)
+			return;
+		this.player.down();
+		this.move(e);
+	}
+
+	up(e) {
+		if (!this.player.charging)
+			return;
+		this.lastFired = this.time.now;
+		let weapon = e.position ? (e.position.x < this.scale.width / 2 ? "claw" : "default") : e;
+		this.player.up(weapon);
+		// this.uileft.alpha = 0.5;
+		// this.uiright.alpha = 0.5;
 	}
 
 	update(time, delta) {
@@ -159,6 +226,15 @@ class MainScene extends Phaser.Scene {
 				if (Phaser.Geom.Intersects.RectangleToRectangle(o.getBounds(), b.getBounds())) {
 					o.destroy();
 					b.destroy();
+				}
+			});
+		});
+
+		this.claws.getChildren().forEach(c => {
+			this.obstacles.getChildren().forEach(o => {
+				if (Phaser.Geom.Intersects.RectangleToRectangle(o.getBounds(), c.getBounds())) {
+					c.destroy();
+					o.freeze();
 				}
 			});
 		});
@@ -172,8 +248,14 @@ class MainScene extends Phaser.Scene {
 		this.player.update(delta);
 	}
 
-	fire(x, y, angle) {
-		let bullet = new Bullet(this, x, y, angle);
-		this.bullets.add(bullet, true);
+	fire(x, y, angle, weapon) {
+		switch (weapon) {
+			case "default":
+				this.bullets.add(new Bullet(this, x, y, angle), true);
+				break;
+			case "claw":
+				this.claws.add(new Claw(this, x, y, angle), true);
+				break;
+		}
 	}
 }
