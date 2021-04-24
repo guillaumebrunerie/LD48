@@ -145,7 +145,7 @@ class MainScene extends Phaser.Scene {
 	update(time, delta) {
 		this.bullets.getChildren().forEach(b => {
 			this.objects.getChildren().forEach(o => {
-				if (Phaser.Geom.Intersects.RectangleToRectangle(o.getBounds(), b.getBounds())) {
+				if (inCircle(o.getBounds(), b.getBounds().centerX, b.getBounds().centerY)) {
 					o.destroy();
 					b.destroy();
 				}
@@ -156,7 +156,7 @@ class MainScene extends Phaser.Scene {
 			if (c.pullingBack)
 				return;
 			this.objects.getChildren().forEach(p => {
-				if (Phaser.Geom.Intersects.RectangleToRectangle(p.getBounds(), c.getBounds())) {
+				if (inCircle(p.getBounds(), c.getBounds().centerX, c.getBounds().centerY)) {
 					c.pullback();
 					p.pullback(c);
 				}
