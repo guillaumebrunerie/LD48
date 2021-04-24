@@ -49,7 +49,7 @@ conf.obstacles.forEach(o => {
 });
 
 // Powerups
-conf.powerUpCreationRate = 9;
+conf.powerUpCreationRate = 6;
 
 conf.powerUps = [
 	{name: "Laser"},

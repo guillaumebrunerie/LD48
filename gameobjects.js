@@ -31,12 +31,21 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.speedX = c.speedX;
 		this.speedY = c.speedY;
 	}
+
+	magnetize() {
+		let speed = Math.sqrt((this.speedX * this.speedX) + (this.speedY * this.speedY));
+		let angle = Math.atan2(this.y - this.scene.robot.y, this.x - this.scene.robot.x);
+		this.speedX = -speed * Math.cos(angle);
+		this.speedY = -speed * Math.sin(angle);
+	}
 }
 
 class Obstacle extends DriftingThing {
 	constructor(scene) {
 		super(scene, pick(conf.obstacles));
 	}
+
+	magnetize() {}
 
 	collect() {
 		this.scene.loseLife();
@@ -53,6 +62,7 @@ class PowerUp extends DriftingThing {
 			case "Laser":
 				break;
 			case "Magnet":
+				this.scene.magnetize();
 				break;
 			case "Shield":
 				this.scene.repairShield();

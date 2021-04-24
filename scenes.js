@@ -138,6 +138,10 @@ class MainScene extends Phaser.Scene {
 		}
 	}
 
+	magnetize() {
+		this.objects.getChildren().forEach(o => o.magnetize());
+	}
+
 	update(time, delta) {
 		this.bullets.getChildren().forEach(b => {
 			this.objects.getChildren().forEach(o => {
