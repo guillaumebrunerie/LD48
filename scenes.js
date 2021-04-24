@@ -1,6 +1,6 @@
 class Obstacle extends Phaser.GameObjects.Sprite {
-	constructor (scene, x, y) {
-		super(scene, x, y, "player");
+	constructor (scene) {
+		super(scene, Math.random() * scene.scale.width, scene.scale.height, "player");
 		this.scale = 0.4;
 		this.speed = rand(conf.obstacleSpeed);
 		this.frozen = false;
@@ -21,8 +21,8 @@ class Obstacle extends Phaser.GameObjects.Sprite {
 }
 
 class PowerUp extends Phaser.GameObjects.Sprite {
-	constructor (scene, x, y) {
-		super(scene, x, y, "player");
+	constructor (scene) {
+		super(scene, Math.random() * scene.scale.width, scene.scale.height, "player");
 		this.rotation = Math.PI/4;
 		this.scale = 0.3;
 		this.speed = rand(conf.powerUpSpeed);
@@ -168,13 +168,18 @@ class MainScene extends Phaser.Scene {
 
 	preload() {
 		this.load.setPath("assets");
-		this.load.image(["player"]);
+		this.load.image("player");
+		this.load.image("astronaut", "Astronaut/Astronaut.png");
+		this.load.image("bg", "Bg/Bg.jpg");
 
 		this.load.setPath("audio");
 		this.load.audio([]);
 	}
 
 	create() {
+		this.add.image(0, 0, "bg").setOrigin(0, 0);
+		this.add.image(this.scale.width / 2, 100, "astronaut");
+
 		this.obstacles = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.powerUps = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
@@ -187,8 +192,6 @@ class MainScene extends Phaser.Scene {
 
 		this.lastCreatedPowerUp = this.time.now;
 		this.powerUpCreationRate = conf.powerUpCreationRate;
-
-		this.add.sprite(450, 100, "player");
 
 		let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
@@ -260,13 +263,13 @@ class MainScene extends Phaser.Scene {
 		});
 
 		if (time > this.lastCreatedObstacle + this.obstacleCreationRate * 1000) {
-			let obstacle = new Obstacle(this, Math.random() * 900, 1600);
+			let obstacle = new Obstacle(this);
 			this.obstacles.add(obstacle, true);
 			this.lastCreatedObstacle = time;
 		}
 
 		if (time > this.lastCreatedPowerUp + this.powerUpCreationRate * 1000) {
-			let powerUp = new PowerUp(this, Math.random() * 900, 1600);
+			let powerUp = new PowerUp(this);
 			this.powerUps.add(powerUp, true);
 			this.lastCreatedPowerUp = time;
 		}

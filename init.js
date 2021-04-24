@@ -4,8 +4,8 @@ new Phaser.Game({
 	scale: {
 		autoCenter: Phaser.Scale.CENTER_BOTH,
 		mode: Phaser.Scale.FIT,
-		width: 900,
-		height: 1600,
+		width: 1080,
+		height: 1920,
 	},
 	scene: [MainScene],
 });
