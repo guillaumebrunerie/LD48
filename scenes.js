@@ -1,7 +1,7 @@
 class Obstacle extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y) {
 		super(scene, x, y, "player");
-		this.scale = 0.3;
+		this.scale = 0.4;
 		this.speed = rand(conf.obstacleSpeed);
 		this.frozen = false;
 	}
@@ -17,6 +17,22 @@ class Obstacle extends Phaser.GameObjects.Sprite {
 
 	freeze() {
 		this.frozen = true;
+	}
+}
+
+class PowerUp extends Phaser.GameObjects.Sprite {
+	constructor (scene, x, y) {
+		super(scene, x, y, "player");
+		this.rotation = Math.PI/4;
+		this.scale = 0.3;
+		this.speed = rand(conf.powerUpSpeed);
+	}
+
+	update(time, delta) {
+
+		this.y -= this.speed * delta;
+		if (this.getBottomCenter().y < 0)
+			this.destroy();
 	}
 }
 
@@ -127,7 +143,7 @@ class Claw extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y, angle) {
 		super(scene, x, y, "player");
 		this.scale = 0.2;
-		this.speed = 1 * (Math.random() * 3 + 1);
+		this.speed = conf.clawSpeed;
 		this.angle = angle;
 	}
 
@@ -160,13 +176,17 @@ class MainScene extends Phaser.Scene {
 
 	create() {
 		this.obstacles = this.add.group({runChildUpdate: true, maxSize: 10});
+		this.powerUps = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
 		this.claws = this.add.group({runChildUpdate: true, maxSize: 1});
 
-		this.lastCreatedObstacle = 0;
-		this.creationRate = 2;
+		this.lastCreatedObstacle = this.time.now;
+		this.obstacleCreationRate = conf.obstacleCreationRate;
 		this.player = new Player(this);
 		this.add.existing(this.player);
+
+		this.lastCreatedPowerUp = this.time.now;
+		this.powerUpCreationRate = conf.powerUpCreationRate;
 
 		this.add.sprite(450, 100, "player");
 
@@ -175,10 +195,10 @@ class MainScene extends Phaser.Scene {
 		spaceBar.on("down", () => this.down("default"));
 		spaceBar.on("up",   () => this.up("default"));
 
-		let ctrl = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.CTRL);
+		let tab = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
 
-		ctrl.on("down", () => this.down("claw"));
-		ctrl.on("up",   () => this.up("claw"));
+		tab.on("down", () => this.down("claw"));
+		tab.on("up",   () => this.up("claw"));
 
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
@@ -239,10 +259,16 @@ class MainScene extends Phaser.Scene {
 			});
 		});
 
-		if (time > this.lastCreatedObstacle + this.creationRate * 1000) {
+		if (time > this.lastCreatedObstacle + this.obstacleCreationRate * 1000) {
 			let obstacle = new Obstacle(this, Math.random() * 900, 1600);
 			this.obstacles.add(obstacle, true);
 			this.lastCreatedObstacle = time;
+		}
+
+		if (time > this.lastCreatedPowerUp + this.powerUpCreationRate * 1000) {
+			let powerUp = new PowerUp(this, Math.random() * 900, 1600);
+			this.powerUps.add(powerUp, true);
+			this.lastCreatedPowerUp = time;
 		}
 
 		this.player.update(delta);
