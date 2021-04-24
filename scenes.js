@@ -1,39 +1,31 @@
-class Obstacle extends Phaser.GameObjects.Sprite {
-	constructor (scene) {
-		let type = pick(["o_asteroid_01", "o_asteroid_02"]);
-		super(scene, Math.random() * scene.scale.width, scene.scale.height, type);
-		this.type = type;
-		this.speed = rand(conf.obstacleSpeed);
-		this.frozen = false;
+class DriftingThing extends Phaser.GameObjects.Sprite {
+	constructor(scene, conf) {
+		super(scene, Math.random() * scene.scale.width, scene.scale.height, conf.name);
+		this.rotation = Math.random() * Math.PI*2;
+		this.y = this.y + this.height / 2;
+		this.type = conf.name;
+		this.speed = rand(conf.speed);
+		this.rotationSpeed = rand(conf.rSpeed);
+		this.scale = rand(conf.scale);
 	}
 
 	update(time, delta) {
-		if (this.frozen)
-			return;
-
 		this.y -= this.speed * delta;
-		if (this.getBottomCenter().y < 0)
+		this.rotation += this.rotationSpeed * delta;
+		if (this.getBounds().bottom < 0)
 			this.destroy();
-	}
-
-	freeze() {
-		this.frozen = true;
 	}
 }
 
-class PowerUp extends Phaser.GameObjects.Sprite {
+class Obstacle extends DriftingThing {
 	constructor (scene) {
-		let type = pick(["pu_laser", "pu_magnet", "pu_shield", "pu_target"]);
-		super(scene, Math.random() * scene.scale.width, scene.scale.height, type);
-		this.type = type;
-		this.rotation = Math.PI/4;
-		this.speed = rand(conf.powerUpSpeed);
+		super(scene, pick(conf.obstacles));
 	}
+}
 
-	update(time, delta) {
-		this.y -= this.speed * delta;
-		if (this.getBottomCenter().y < 0)
-			this.destroy();
+class PowerUp extends DriftingThing {
+	constructor (scene) {
+		super(scene, pick(conf.powerUps));
 	}
 }
 
@@ -177,12 +169,12 @@ class MainScene extends Phaser.Scene {
 		this.load.image("astronaut", "Astronaut/Astronaut.png");
 		this.load.image("bg", "Bg/Bg.jpg");
 
-		["Laser", "Magnet", "Shield", "Target"].forEach(pu => {
-			this.load.image("pu_" + pu.toLowerCase(), `PowerUps/PowerUp_${pu}.png`);
+		conf.obstacles.forEach(o => {
+			this.load.image(o.name, `Obstacles/Obstacle_${o.name}.png`);
 		});
 
-		["Asteroid_01", "Asteroid_02"].forEach(pu => {
-			this.load.image("o_" + pu.toLowerCase(), `Obstacles/Obstacle_${pu}.png`);
+		conf.powerUps.forEach(pu => {
+			this.load.image(pu.name, `PowerUps/PowerUp_${pu.name}.png`);
 		});
 
 		this.load.setPath("audio");
@@ -198,13 +190,11 @@ class MainScene extends Phaser.Scene {
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
 		this.claws = this.add.group({runChildUpdate: true, maxSize: 1});
 
-		this.lastCreatedObstacle = this.time.now;
-		this.obstacleCreationRate = conf.obstacleCreationRate;
 		this.player = new Player(this);
 		this.add.existing(this.player);
 
 		this.lastCreatedPowerUp = this.time.now;
-		this.powerUpCreationRate = conf.powerUpCreationRate;
+		this.lastCreatedObstacle = -Infinity;
 
 		let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
@@ -275,13 +265,13 @@ class MainScene extends Phaser.Scene {
 			});
 		});
 
-		if (time > this.lastCreatedObstacle + this.obstacleCreationRate * 1000) {
+		if (time > this.lastCreatedObstacle + conf.obstacleCreationRate * 1000) {
 			let obstacle = new Obstacle(this);
 			this.obstacles.add(obstacle, true);
 			this.lastCreatedObstacle = time;
 		}
 
-		if (time > this.lastCreatedPowerUp + this.powerUpCreationRate * 1000) {
+		if (time > this.lastCreatedPowerUp + conf.powerUpCreationRate * 1000) {
 			let powerUp = new PowerUp(this);
 			this.powerUps.add(powerUp, true);
 			this.lastCreatedPowerUp = time;
