@@ -1,12 +1,13 @@
 conf = {};
 
 // The astronaut
-conf.astronautY = 220;
+conf.lineY = 120;
+conf.astronautY = 240;
 
 // The robot
 conf.robotSpeed = 0.001;
 conf.angleMax = 0.3;
-conf.robotY = 500;
+conf.robotY = 520;
 conf.robotRadius = 1000;
 
 // Shooting beam
@@ -30,11 +31,13 @@ conf.obstacles = [
 ];
 
 // Default values
-conf.obstacleSpeed = {min: 0.05, max: 0.2};
-conf.obstacleRotationSpeed = {min: -0.001, max: 0.001};
+conf.obstacleSpeedY = {min: -0.05, max: -0.2};
+conf.obstacleSpeedX = {min: -0.1, max: 0.1};
+conf.obstacleSpeedR = {min: -0.001, max: 0.001};
 conf.obstacles.forEach(o => {
-	o.speed = o.speed === undefined ? conf.obstacleSpeed : o.speed;
-	o.rSpeed = o.rSpeed === undefined ? conf.obstacleRotationSpeed : o.rSpeed;
+	o.speedY = o.speedY === undefined ? conf.obstacleSpeedY : o.speedY;
+	o.speedX = o.speedX === undefined ? conf.obstacleSpeedX : o.speedX;
+	o.speedR = o.speedR === undefined ? conf.obstacleSpeedR : o.speedR;
 	o.scale = o.scale === undefined ? 1 : o.scale;
 });
 
@@ -49,10 +52,12 @@ conf.powerUps = [
 ];
 
 // Default values
-conf.powerUpSpeed = {min: 0.1, max: 0.4};
-conf.powerUpRotationSpeed = {min: -0.001, max: 0.001};
+conf.powerUpSpeedY = {min: -0.1, max: -0.4};
+conf.powerUpSpeedX = {min: -0.1, max: 0.1};
+conf.powerUpSpeedR = {min: -0.001, max: 0.001};
 conf.powerUps.forEach(p => {
-	p.speed = p.speed === undefined ? conf.powerUpSpeed : p.speed;
-	p.rSpeed = p.rSpeed === undefined ? conf.powerUpRotationSpeed : p.rSpeed;
+	p.speedY = p.speedY === undefined ? conf.powerUpSpeedY : p.speedY;
+	p.speedX = p.speedX === undefined ? conf.powerUpSpeedX : p.speedX;
+	p.speedR = p.speedR === undefined ? conf.powerUpSpeedR : p.speedR;
 	p.scale = p.scale === undefined ? 1 : p.scale;
 });
