@@ -21,18 +21,22 @@ class MainScene extends Phaser.Scene {
 			this.load.image(pu.name, `PowerUps/PowerUp_${pu.name}.png`);
 		});
 
+		this.load.image("ScrewInventory","UI/UI_ScrewInventory.png");
+		this.load.image("UI_Screw","UI/UI_Screw.png");
+		this.load.image("Screw","Collectables/Screw.png");
+
 		this.load.setPath("audio");
 		this.load.audio([]);
 	}
 
 	create() {
 		this.add.image(0, 0, "Bg").setOrigin(0, 0);
+		this.add.image(conf.inventoryX, conf.inventoryY, "ScrewInventory");
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
 		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
 		this.add.image(this.scale.width / 2, conf.astronautY, "ShieldBubble");
 
-		this.obstacles = this.add.group({runChildUpdate: true, maxSize: 10});
-		this.powerUps = this.add.group({runChildUpdate: true, maxSize: 10});
+		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
 		this.claws = this.add.group({runChildUpdate: true, maxSize: 1});
 
@@ -40,6 +44,7 @@ class MainScene extends Phaser.Scene {
 		this.add.existing(this.robot);
 
 		this.lastCreatedPowerUp = this.time.now;
+		this.lastCreatedScrew = this.time.now;
 		this.lastCreatedObstacle = -Infinity;
 
 		let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -55,6 +60,8 @@ class MainScene extends Phaser.Scene {
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
 		this.input.on("pointermove", (e) => this.move(e));
+
+		this.collectedScrews = 0;
 
 		// this.uileft  = this.add.image(this.scale.width / 4, this.scale.height, "uileft");
 		// this.uileft.setOrigin(0.5, 1);
@@ -92,9 +99,16 @@ class MainScene extends Phaser.Scene {
 		// this.uiright.alpha = 0.5;
 	}
 
+	collectScrew() {
+		let x = conf.inventoryX + conf.screwX + this.collectedScrews * conf.screwdX;
+		let y = conf.inventoryY + conf.screwY;
+		this.add.image(x, y, "UI_Screw");
+		this.collectedScrews++;
+	}
+
 	update(time, delta) {
 		this.bullets.getChildren().forEach(b => {
-			this.obstacles.getChildren().forEach(o => {
+			this.objects.getChildren().forEach(o => {
 				if (Phaser.Geom.Intersects.RectangleToRectangle(o.getBounds(), b.getBounds())) {
 					o.destroy();
 					b.destroy();
@@ -105,7 +119,7 @@ class MainScene extends Phaser.Scene {
 		this.claws.getChildren().forEach(c => {
 			if (c.pullingBack)
 				return;
-			this.powerUps.getChildren().forEach(p => {
+			this.objects.getChildren().forEach(p => {
 				if (Phaser.Geom.Intersects.RectangleToRectangle(p.getBounds(), c.getBounds())) {
 					c.pullback();
 					p.pullback(c);
@@ -115,14 +129,20 @@ class MainScene extends Phaser.Scene {
 
 		if (time > this.lastCreatedObstacle + conf.obstacleCreationRate * 1000) {
 			let obstacle = new Obstacle(this);
-			this.obstacles.add(obstacle, true);
+			this.objects.add(obstacle, true);
 			this.lastCreatedObstacle = time;
 		}
 
 		if (time > this.lastCreatedPowerUp + conf.powerUpCreationRate * 1000) {
 			let powerUp = new PowerUp(this);
-			this.powerUps.add(powerUp, true);
+			this.objects.add(powerUp, true);
 			this.lastCreatedPowerUp = time;
+		}
+
+		if (time > this.lastCreatedScrew + conf.screwCreationRate * 1000) {
+			let screw = new Screw(this);
+			this.objects.add(screw, true);
+			this.lastCreatedScrew = time;
 		}
 
 		this.robot.update(delta);

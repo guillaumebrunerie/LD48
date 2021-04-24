@@ -1,4 +1,4 @@
-// Driftings things consist of obstacles and power ups
+// Driftings things consist of obstacles and collectables
 
 class DriftingThing extends Phaser.GameObjects.Sprite {
 	constructor(scene, conf) {
@@ -7,6 +7,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.y = this.y + this.height / 2;
 		this.type = conf.name;
 		this.scale = rand(conf.scale);
+		this.isPulledBack = false;
 
 		this.speedX = rand(conf.speedX);
 		this.speedY = rand(conf.speedY);
@@ -18,25 +19,39 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.y += delta * this.speedY;
 		this.rotation += delta * this.speedR;
 
-		if (this.getBounds().bottom < 0)
+		if (this.getBounds().bottom < 0) {
+			if (this.isPulledBack && this.collect)
+				this.collect();
 			this.destroy();
+		}
 	}
 
 	pullback(c) {
+		this.isPulledBack = true;
 		this.speedX = c.speedX;
 		this.speedY = c.speedY;
 	}
 }
 
 class Obstacle extends DriftingThing {
-	constructor (scene) {
+	constructor(scene) {
 		super(scene, pick(conf.obstacles));
 	}
 }
 
 class PowerUp extends DriftingThing {
-	constructor (scene) {
+	constructor(scene) {
 		super(scene, pick(conf.powerUps));
+	}
+}
+
+class Screw extends DriftingThing {
+	constructor(scene) {
+		super(scene, pick(conf.screws));
+	}
+
+	collect() {
+		this.scene.collectScrew();
 	}
 }
 

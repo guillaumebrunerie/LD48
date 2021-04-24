@@ -1,5 +1,12 @@
 conf = {};
 
+// The inventory
+conf.inventoryX = 150;
+conf.inventoryY = 80;
+conf.screwX = -64;
+conf.screwY = 1;
+conf.screwdX = 62;
+
 // The astronaut
 conf.lineY = 120;
 conf.astronautY = 240;
@@ -61,3 +68,10 @@ conf.powerUps.forEach(p => {
 	p.speedR = p.speedR === undefined ? conf.powerUpSpeedR : p.speedR;
 	p.scale = p.scale === undefined ? 1 : p.scale;
 });
+
+// Screw
+conf.screwCreationRate = 5;
+
+conf.screws = [
+	{name: "Screw", speedX: {min: -0.1, max: 0.1}, speedY: {min: -0.1, max: -0.4}, speedR: {min: -0.001, max: 0.001}, scale: 1}
+];
