@@ -2,6 +2,7 @@ class Obstacle extends Phaser.GameObjects.Sprite {
 	constructor (scene) {
 		let type = pick(["o_asteroid_01", "o_asteroid_02"]);
 		super(scene, Math.random() * scene.scale.width, scene.scale.height, type);
+		this.y = this.y + this.height / 2;
 		this.type = type;
 		this.speed = rand(conf.obstacleSpeed);
 		this.frozen = false;
@@ -25,6 +26,7 @@ class PowerUp extends Phaser.GameObjects.Sprite {
 	constructor (scene) {
 		let type = pick(["pu_laser", "pu_magnet", "pu_shield", "pu_target"]);
 		super(scene, Math.random() * scene.scale.width, scene.scale.height, type);
+		this.y = this.y + this.height / 2;
 		this.type = type;
 		this.rotation = Math.PI/4;
 		this.speed = rand(conf.powerUpSpeed);
