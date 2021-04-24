@@ -16,11 +16,12 @@ conf.reloadDelay = 0.2;
 
 // Claw
 conf.clawSpeed = 1;
+conf.clawPullbackSpeed = 0.5;
 
 // Obstacles
 conf.obstacleSpeed = {min: 0.05, max: 0.2};
-conf.obstacleCreationRate = 2;
+conf.obstacleCreationRate = 3;
 
 // Powerups
 conf.powerUpSpeed = {min: 0.1, max: 0.4};
-conf.powerUpCreationRate = 6;
+conf.powerUpCreationRate = 9;

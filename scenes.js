@@ -1,7 +1,8 @@
 class Obstacle extends Phaser.GameObjects.Sprite {
 	constructor (scene) {
-		super(scene, Math.random() * scene.scale.width, scene.scale.height, "player");
-		this.scale = 0.4;
+		let type = pick(["o_asteroid_01", "o_asteroid_02"]);
+		super(scene, Math.random() * scene.scale.width, scene.scale.height, type);
+		this.type = type;
 		this.speed = rand(conf.obstacleSpeed);
 		this.frozen = false;
 	}
@@ -22,14 +23,14 @@ class Obstacle extends Phaser.GameObjects.Sprite {
 
 class PowerUp extends Phaser.GameObjects.Sprite {
 	constructor (scene) {
-		super(scene, Math.random() * scene.scale.width, scene.scale.height, "player");
+		let type = pick(["pu_laser", "pu_magnet", "pu_shield", "pu_target"]);
+		super(scene, Math.random() * scene.scale.width, scene.scale.height, type);
+		this.type = type;
 		this.rotation = Math.PI/4;
-		this.scale = 0.3;
 		this.speed = rand(conf.powerUpSpeed);
 	}
 
 	update(time, delta) {
-
 		this.y -= this.speed * delta;
 		if (this.getBottomCenter().y < 0)
 			this.destroy();
@@ -157,6 +158,10 @@ class Claw extends Phaser.GameObjects.Sprite {
 		if (this.y > 1600)
 			this.destroy();
 	}
+
+	pullback() {
+		this.speed = -conf.clawPullbackSpeed;
+	}
 }
 
 class MainScene extends Phaser.Scene {
@@ -172,13 +177,21 @@ class MainScene extends Phaser.Scene {
 		this.load.image("astronaut", "Astronaut/Astronaut.png");
 		this.load.image("bg", "Bg/Bg.jpg");
 
+		["Laser", "Magnet", "Shield", "Target"].forEach(pu => {
+			this.load.image("pu_" + pu.toLowerCase(), `PowerUps/PowerUp_${pu}.png`);
+		});
+
+		["Asteroid_01", "Asteroid_02"].forEach(pu => {
+			this.load.image("o_" + pu.toLowerCase(), `Obstacles/Obstacle_${pu}.png`);
+		});
+
 		this.load.setPath("audio");
 		this.load.audio([]);
 	}
 
 	create() {
 		this.add.image(0, 0, "bg").setOrigin(0, 0);
-		this.add.image(this.scale.width / 2, 100, "astronaut");
+		this.add.image(this.scale.width / 2, 0, "astronaut").setOrigin(0.5, 0);
 
 		this.obstacles = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.powerUps = this.add.group({runChildUpdate: true, maxSize: 10});
@@ -254,10 +267,10 @@ class MainScene extends Phaser.Scene {
 		});
 
 		this.claws.getChildren().forEach(c => {
-			this.obstacles.getChildren().forEach(o => {
-				if (Phaser.Geom.Intersects.RectangleToRectangle(o.getBounds(), c.getBounds())) {
-					c.destroy();
-					o.freeze();
+			this.powerUps.getChildren().forEach(p => {
+				if (Phaser.Geom.Intersects.RectangleToRectangle(p.getBounds(), c.getBounds())) {
+					c.pullback();
+					p.pullback(c);
 				}
 			});
 		});
