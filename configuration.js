@@ -28,7 +28,7 @@ conf.eyesY = -8;
 
 // Shooting beam
 conf.beamAngle = 0.3;
-conf.beamSpeed = 2.5;
+conf.beamSpeed = 3.5;
 conf.shootingRangeY = -100;
 
 // Bullets
@@ -39,6 +39,7 @@ conf.bulletScale = 1.4;
 // Hand
 conf.handSpeed = 1;
 conf.handPullbackSpeed = 0.5;
+conf.fastHand = 5;
 
 // Obstacles
 conf.obstacleCreationRate = {min: 1, max: 3};
@@ -56,7 +57,7 @@ conf.obstacleDefault = {
 };
 
 // Powerups
-conf.powerUpCreationRate = {min: 5, max: 10};
+conf.powerUpCreationRate = {min: 2, max: 5};
 
 conf.powerUps = [
 	{name: "Laser"},

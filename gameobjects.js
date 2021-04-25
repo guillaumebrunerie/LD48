@@ -60,6 +60,7 @@ class PowerUp extends DriftingThing {
 	collect() {
 		switch (this.type) {
 			case "Laser":
+				this.scene.hasLaser = true;
 				break;
 			case "Magnet":
 				this.scene.magnetize();
@@ -149,8 +150,9 @@ class Robot extends Phaser.GameObjects.Container {
 
 		if (this.charging) {
 			this.chargingLevel += delta / (1000 * this.beamSpeed * conf.beamAngle);
-			if (this.chargingLevel > 1)
-				this.chargingLevel = 1;
+			if (this.chargingLevel > 1) {
+				this.scene.fullCharge();
+			}
 			this.shootingRange.setScale(Math.max(4 * (1 - this.chargingLevel), 0.05), 4);
 			this.shootingRange.setAlpha(this.chargingLevel / 2);
 		}
@@ -160,7 +162,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.shootingRange.visible = true;
 		this.charging = true;
 		this.chargingLevel = 0;
-		this.eyes.play("RobotEyes");
+		this.eyes.play(this.scene.hasLaser ? "RobotLaserEyes" : "RobotEyes");
 	}
 
 	up(weapon) {
@@ -272,7 +274,7 @@ class Hand extends Phaser.GameObjects.Container {
 
 	pullbackFast() {
 		this.pullingBack = true;
-		this.speedX = -this.speedX * 3;
-		this.speedY = -this.speedY * 3;
+		this.speedX = -this.speedX * conf.fastHand;
+		this.speedY = -this.speedY * conf.fastHand;
 	}
 }

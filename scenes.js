@@ -32,12 +32,13 @@ class MainScene extends Phaser.Scene {
 
 	preload() {
 		this.load.setPath("assets");
-		this.load.image("player");
 		this.load.image("Astronaut", "Astronaut/Astronaut.png");
 		this.load.image("Astronaut_Line", "Astronaut/Astronaut_Line.png");
 		this.load.image("Shield1", "Fx/ShieldBubble2.png");
 		this.load.image("Shield2", "Fx/ShieldBubble.png");
-		this.load.image("Bg", "Bg/Bg.jpg");
+
+		this.load.setPath("assets/Bg");
+		this.load.image([{key: "Bg", url: "Bg.jpg"}, {key: "BgLong", url: "BgLong.jpg"}, "BgStars", "BgStars2"]);
 
 		this.load.setPath("assets/Robot");
 		this.load.image(["Robot", "Robot_Hand", "Robot_Line", "RobotShootingRange"]);
@@ -49,6 +50,10 @@ class MainScene extends Phaser.Scene {
 		this.loadPNGSequence("RobotHandStart", 8);
 		this.load.setPath("assets/Robot/RobotShot");
 		this.loadPNGSequence("RobotShot", 13);
+		this.load.setPath("assets/Robot/RobotLaser");
+		this.loadPNGSequence("RobotLaser", 3);
+		this.load.setPath("assets/Robot/RobotLaserEyes");
+		this.loadPNGSequence("RobotLaserEyes", 10);
 
 		this.load.setPath("assets");
 
@@ -72,9 +77,36 @@ class MainScene extends Phaser.Scene {
 		this.load.audio([]);
 	}
 
+	// makeParallaxImage(key, duration, dy) {
+	// 	let image = this.add.image(0
+	// 	this.tweens.add({
+	// 		targets: image,
+	// 		y: -dy,
+	// 		duration: duration,
+	// 		repeat: -1,
+	// 	});
+	// }
+
 	create() {
 		// Background
 		this.add.image(0, 0, "Bg").setOrigin(0, 0).setDepth(-10);
+		// let bg = this.add.image(0, 0, "BgLong")
+		// 	.setOrigin(0, 0)
+		// 	.setScale(1080/196)
+		// 	.setDepth(-10);
+		// let bgFlip = this.add.image(0, 0, "BgLong")
+		// 	.setOrigin(0, 0)
+		// 	.setScale(1080/196, -1080/196)
+		// 	.setDepth(-10);
+		// bgFlip.y += bgFlip.getBounds().height;
+		// this.makeParallaxImage(bg, 3000, bg.getBounds().height * 2);
+		// this.makeParallaxImage(bgFlip, 3000, bgFlip.getBounds().height * 2);
+		// this.bg2 = this.add.image(0, 0, "BgLong")
+		// 	.setOrigin(0, 0)
+		// 	.setScale(1080/196, -1080/196)
+		// 	.setDepth(-10)
+		// 	.setPosition(0, this.bg.getBounds().height);
+		// let bgStars = this.add.image(this.scale.width / 2, this.scale.height / 2, "BgStars");
 
 		// Inventory
 		this.screwContainer = this.add.container(conf.inventoryX, conf.inventoryY)
@@ -97,10 +129,12 @@ class MainScene extends Phaser.Scene {
 		this.uiContainer.add([this.uiSocket, this.uiLeft, this.uiRight]);
 
 		// Robot
-		this.createPNGSequence("RobotEyes", 24, {frameRate: 30});
+		this.createPNGSequence("RobotEyes", 24, {frameRate: 15});
 		this.createPNGSequence("RobotHandGrab", 5);
 		this.createPNGSequence("RobotHandStart", 8);
 		this.createPNGSequence("RobotShot", 13, {repeat: -1});
+		this.createPNGSequence("RobotLaserEyes", 10, {repeat: -1});
+		this.createPNGSequence("RobotLaser", 3);
 
 		this.robot = new Robot(this);
 		this.add.existing(this.robot);
@@ -108,7 +142,7 @@ class MainScene extends Phaser.Scene {
 		this.pulledObject = null;
 
 		// Objects and more
-		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
+		this.objects = this.add.group({runChildUpdate: true, maxSize: 100});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
 		this.hands = this.add.group({runChildUpdate: true, maxSize: 1});
 
@@ -150,8 +184,8 @@ class MainScene extends Phaser.Scene {
 		this.updateUI(e);
 		this.tweens.add({
 			targets: this.uiContainer,
-			alpha: 1,
-			duration: 300,
+			alpha: 0.7,
+			duration: 400,
 			delay: 100,
 		});
 	}
@@ -283,5 +317,45 @@ class MainScene extends Phaser.Scene {
 				this.hands.add(new Hand(this, x, y, angle), true).setDepth(-1);
 				break;
 		}
+	}
+
+	fullCharge() {
+		this.robot.charging = false;
+		this.robot.chargingLevel = 0;
+
+		this.robot.shootingRange.visible = false;
+		this.robot.eyes.stop();
+		this.robot.eyes.setTexture("RobotEyes_000");
+
+		this.uiContainer.setAlpha(0);
+		this.tweens.killTweensOf(this.uiContainer);
+		this.updateUI(null);
+
+		if (this.hasLaser)
+			this.fireLaser();
+	}
+
+	fireLaser() {
+		let laser = this.add.sprite(0, 0, "RobotLaser")
+			.setOrigin(0.5, 0)
+			.setPosition(this.robot.x, this.robot.y)
+			.setRotation(this.robot.rotation);
+		laser.play({key: "RobotLaser", hideOnComplete: true});
+
+		let line = new Phaser.Geom.Line(
+			this.robot.x,
+			this.robot.y,
+			this.robot.x - Math.sin(this.robot.rotation) * 3000,
+			this.robot.y + Math.cos(this.robot.rotation) * 3000,
+		);
+
+		let objects = this.objects.getChildren().slice();
+		objects.forEach(o => {
+			let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height) / 3);
+			let result = Phaser.Geom.Intersects.LineToCircle(line, circle);
+			if (result) {
+				o.destroy();
+			}
+		});
 	}
 }
