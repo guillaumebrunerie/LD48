@@ -165,7 +165,6 @@ class Robot extends Phaser.GameObjects.Container {
 		let firingAngle = this.rotation + Math.PI/2 + this.beam.rotation * rand({min: -1, max: 1});
 
 		this.scene.fire(this.x, this.y, firingAngle, weapon);
-		window.navigator.vibrate(10);
 	}
 }
 

@@ -27,6 +27,10 @@ class MainScene extends Phaser.Scene {
 		this.load.image("UI_Screw","UI/UI_Screw.png");
 		this.load.image("Screw","Collectables/Screw.png");
 
+		this.load.image("UI_Controls", "UI/UI_ControlsSocket.png");
+		this.load.image("UI_Hand", "UI/UI_ControlsButton_Hand.png");
+		this.load.image("UI_Shoot", "UI/UI_ControlsButton_Shoot.png");
+
 		this.load.setPath("audio");
 		this.load.audio([]);
 	}
@@ -37,6 +41,14 @@ class MainScene extends Phaser.Scene {
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
 		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
 		this.shield = this.add.image(this.scale.width / 2, conf.astronautY, "Shield2");
+		this.uiContainer = this.add.container(this.scale.width / 2, conf.uiY)
+			.setDepth(1);
+		this.uiSocket = this.add.image(0, 0, "UI_Controls");
+		this.uiLeft = this.add.image(conf.uiLeftX, conf.uiLeftY, "UI_Hand")
+			.setAlpha(0.2);
+		this.uiRight = this.add.image(conf.uiRightX, conf.uiRightY, "UI_Shoot")
+			.setAlpha(0.2);
+		this.uiContainer.add([this.uiSocket, this.uiLeft, this.uiRight]);
 
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
@@ -64,31 +76,20 @@ class MainScene extends Phaser.Scene {
 		this.input.on("pointermove", (e) => this.move(e));
 
 		this.collectedScrews = 0;
-
-		// this.uileft  = this.add.image(this.scale.width / 4, this.scale.height, "uileft");
-		// this.uileft.setOrigin(0.5, 1);
-		// this.uiright = this.add.image(3 * this.scale.width / 4, this.scale.height, "uileft");
-		// this.uiright.setOrigin(0.5, 1);
 	}
 
 	move(e) {
 		if (!this.robot.charging)
 			return;
 
-		// if (e == "claw" || (e !== "default" && e.position.x < this.scale.width / 2)) {
-		// 	this.uileft.alpha = 1;
-		// 	this.uiright.alpha = 0;
-		// } else {
-		// 	this.uileft.alpha = 0;
-		// 	this.uiright.alpha = 1;
-		// }
+		this.updateUI(e);
 	}
 
 	down(e) {
 		if (this.time.now < this.lastFired + conf.reloadDelay * 1000)
 			return;
 		this.robot.down();
-		this.move(e);
+		this.updateUI(e);
 	}
 
 	up(e) {
@@ -97,8 +98,22 @@ class MainScene extends Phaser.Scene {
 		this.lastFired = this.time.now;
 		let weapon = e.position ? (e.position.x < this.scale.width / 2 ? "claw" : "default") : e;
 		this.robot.up(weapon);
-		// this.uileft.alpha = 0.5;
-		// this.uiright.alpha = 0.5;
+		this.updateUI(null);
+	}
+
+	updateUI(e) {
+		let weapon;
+		if (e && e.position)
+			weapon = (e.position.x < this.scale.width / 2) ? "claw" : "default";
+		else
+			weapon = e;
+
+		this.uiLeft.setAlpha(0.2);
+		this.uiRight.setAlpha(0.2);
+		if (weapon == "default")
+			this.uiRight.setAlpha(0.4);
+		else if (weapon == "claw")
+			this.uiLeft.setAlpha(0.4);
 	}
 
 	collectScrew() {
@@ -113,6 +128,7 @@ class MainScene extends Phaser.Scene {
 		if (this.shieldLevel < 0)
 			this.shieldLevel = 0;
 		this.updateShield();
+		window.navigator.vibrate(100);
 	}
 
 	repairShield() {
@@ -148,6 +164,7 @@ class MainScene extends Phaser.Scene {
 				if (inCircle(o.getBounds(), b.getBounds().centerX, b.getBounds().centerY)) {
 					o.destroy();
 					b.destroy();
+					window.navigator.vibrate(50);
 				}
 			});
 		});
