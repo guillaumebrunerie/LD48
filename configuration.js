@@ -23,6 +23,8 @@ conf.robotSpeed = 2;
 conf.angleMax = 0.3;
 conf.robotY = 520;
 conf.robotRadius = 1000;
+conf.handY = 40;
+conf.eyesY = -8;
 
 // Shooting beam
 conf.beamAngle = 0.3;

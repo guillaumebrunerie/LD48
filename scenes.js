@@ -15,6 +15,21 @@ class MainScene extends Phaser.Scene {
 		this.load.image("Shield2", "Fx/ShieldBubble.png");
 		this.load.image("Bg", "Bg/Bg.jpg");
 
+		this.load.setPath("assets/Robot");
+		this.load.image(["Robot", "Robot_Hand"]);
+		this.load.setPath("assets/Robot/RobotEyesFocus");
+		let eyeAnimationData = [];
+		for (let i = 0; i < 24; i++) {
+			let istr = ("000" + i).substr(-3);
+			let key = "RobotEyes_" + istr;
+			this.load.image(key);
+			eyeAnimationData.push({key, frame: 0});
+		}
+
+		this.eyeAnimationData = eyeAnimationData;
+
+		this.load.setPath("assets");
+
 		conf.obstacles.forEach(o => {
 			this.load.image(o.name, `Obstacles/Obstacle_${o.name}.png`);
 		});
@@ -37,7 +52,9 @@ class MainScene extends Phaser.Scene {
 
 	create() {
 		this.add.image(0, 0, "Bg").setOrigin(0, 0);
-		this.add.image(conf.inventoryX, conf.inventoryY, "ScrewInventory");
+		this.screwContainer = this.add.container(conf.inventoryX, conf.inventoryY)
+			.setDepth(1)
+			.add(this.add.image(0, 0, "ScrewInventory"));
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
 		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
 		this.shield = this.add.image(this.scale.width / 2, conf.astronautY, "Shield2");
@@ -49,6 +66,12 @@ class MainScene extends Phaser.Scene {
 		this.uiRight = this.add.image(conf.uiRightX, conf.uiRightY, "UI_Shoot")
 			.setAlpha(0.2);
 		this.uiContainer.add([this.uiSocket, this.uiLeft, this.uiRight]);
+
+		this.anims.create({
+			key: "EyesFocus",
+			frames: this.eyeAnimationData,
+			frameRate: 30,
+		});
 
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
@@ -118,9 +141,9 @@ class MainScene extends Phaser.Scene {
 	}
 
 	collectScrew() {
-		let x = conf.inventoryX + conf.screwX + this.collectedScrews * conf.screwdX;
-		let y = conf.inventoryY + conf.screwY;
-		this.add.image(x, y, "UI_Screw");
+		let x = conf.screwX + this.collectedScrews * conf.screwdX;
+		let y = conf.screwY;
+		this.screwContainer.add(this.add.image(x, y, "UI_Screw"));
 		this.collectedScrews++;
 	}
 

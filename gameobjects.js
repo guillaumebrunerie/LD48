@@ -90,9 +90,14 @@ class Robot extends Phaser.GameObjects.Container {
 	constructor (scene) {
 		super(scene, 450, 50);
 
-		let robot = scene.add.sprite(0, 0, "player");
+		let hand = scene.add.sprite(0, conf.handY, "Robot_Hand");
+		this.add(hand);
+
+		let robot = scene.add.sprite(0, 0, "Robot");
 		this.add(robot);
-		robot.scale = 0.4;
+
+		this.eyes = scene.add.sprite(0, conf.eyesY, "RobotEyes_000");
+		this.add(this.eyes);
 
 		this.beam = scene.add.sprite(0, 0, "player");
 		this.beam.setOrigin(0.5, 0);
@@ -161,6 +166,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.beam2.visible = true;
 		this.charging = true;
 		this.timeCharging = 0;
+		this.eyes.play("EyesFocus");
 	}
 
 	up(weapon) {
@@ -171,6 +177,8 @@ class Robot extends Phaser.GameObjects.Container {
 		let firingAngle = this.rotation + Math.PI/2 + this.beam.rotation * rand({min: -1, max: 1});
 
 		this.scene.fire(this.x, this.y, firingAngle, weapon);
+		this.eyes.stop();
+		this.eyes.setTexture("RobotEyes_000");
 	}
 }
 
