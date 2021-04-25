@@ -88,7 +88,7 @@ class MainScene extends Phaser.Scene {
 
 		// UI
 		this.uiContainer = this.add.container(0, 0)
-			.setDepth(1).setVisible(false);
+			.setDepth(1).setAlpha(0);
 		this.uiSocket = this.add.image(0, 0, "UI_Controls").setRotation(Math.PI/2);
 		this.uiLeft = this.add.image(conf.uiLeftX, conf.uiLeftY, "UI_Hand")
 			.setAlpha(0.2);
@@ -148,6 +148,12 @@ class MainScene extends Phaser.Scene {
 		this.downPosition = {x: e.position.x, y: e.position.y};
 		this.robot.down();
 		this.updateUI(e);
+		this.tweens.add({
+			targets: this.uiContainer,
+			alpha: 1,
+			duration: 300,
+			delay: 100,
+		});
 	}
 
 	up(e) {
@@ -156,6 +162,8 @@ class MainScene extends Phaser.Scene {
 		this.lastFired = this.time.now;
 		let weapon = e.position ? ((this.downPosition.y - e.position.y > 100) ? "hand" : "default") : e;
 		this.robot.up(weapon);
+		this.uiContainer.setAlpha(0);
+		this.tweens.killTweensOf(this.uiContainer);
 		this.updateUI(null);
 	}
 
@@ -166,7 +174,6 @@ class MainScene extends Phaser.Scene {
 		else
 			weapon = e;
 
-		this.uiContainer.setVisible(!!e);
 		this.uiContainer.x = this.downPosition.x;
 		this.uiContainer.y = this.downPosition.y - 200;
 		this.uiLeft.setAlpha(0.2);
