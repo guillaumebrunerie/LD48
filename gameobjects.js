@@ -243,7 +243,10 @@ class Hand extends Phaser.GameObjects.Container {
 
 		this.rotation = Math.atan2(this.y - this.scene.robot.y, this.x - this.scene.robot.x) - Math.PI/2;
 
-		if (this.y < this.scene.robot.y) {
+		let dx = this.x - this.scene.robot.x;
+		let dy = this.y - this.scene.robot.y;
+
+		if (dy < 0) {
 			this.scene.robot.ungrab();
 			this.destroy();
 			return;
@@ -252,6 +255,11 @@ class Hand extends Phaser.GameObjects.Container {
 		if (this.y > this.scene.scale.height) {
 			this.pullbackFast();
 		}
+
+		if (dx > dy)
+			this.x -= (dx - dy);
+		if (dx < -dy)
+			this.x += (-dy -dx);
 	}
 
 	pullback() {
