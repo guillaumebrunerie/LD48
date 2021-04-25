@@ -338,7 +338,6 @@ class MainScene extends Phaser.Scene {
 	}
 
 	fullCharge() {
-		this.robot.charging = false;
 		this.robot.chargingLevel = 0;
 
 		this.robot.shootingRange.visible = false;
@@ -351,14 +350,18 @@ class MainScene extends Phaser.Scene {
 
 		if (this.hasLaser)
 			this.fireLaser();
+		else
+			this.robot.charging = false;
 	}
 
 	fireLaser() {
-		let laser = this.add.sprite(0, 0, "RobotLaser")
-			.setOrigin(0.5, 0)
-			.setPosition(this.robot.x, this.robot.y)
-			.setRotation(this.robot.rotation);
-		laser.play({key: "RobotLaser", hideOnComplete: true});
+		let laserC = this.add.container(this.robot.x, this.robot.y)
+				.setRotation(this.robot.rotation);
+		let laser = this.add.sprite(0, conf.laserY, "RobotLaser")
+				.setOrigin(0.5, 0);
+		laserC.add(laser);
+		laser.play({key: "RobotLaser", hideOnComplete: true})
+			.on("animationcomplete", () => this.robot.charging = false);
 
 		let line = new Phaser.Geom.Line(
 			this.robot.x,

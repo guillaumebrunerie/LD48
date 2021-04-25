@@ -36,6 +36,9 @@ conf.bulletSpeed = 2;
 conf.reloadDelay = 0;
 conf.bulletScale = 1.4;
 
+// Laser
+conf.laserY = -65;
+
 // Hand
 conf.handSpeed = 1;
 conf.handPullbackSpeed = 0.5;
