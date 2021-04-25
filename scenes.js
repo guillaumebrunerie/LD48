@@ -57,9 +57,9 @@ class MainScene extends Phaser.Scene {
 		this.robot = new Robot(this);
 		this.add.existing(this.robot);
 
-		this.lastCreatedPowerUp = this.time.now;
-		this.lastCreatedScrew = this.time.now;
-		this.lastCreatedObstacle = -Infinity;
+		this.nextObstacle = this.time.now;
+		this.nextPowerUp = this.time.now + 5000;
+		this.nextScrew = this.time.now + 30000;
 
 		let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
@@ -76,6 +76,7 @@ class MainScene extends Phaser.Scene {
 		this.input.on("pointermove", (e) => this.move(e));
 
 		this.collectedScrews = 0;
+		this.lastTime = this.time.now;
 	}
 
 	move(e) {
@@ -159,6 +160,10 @@ class MainScene extends Phaser.Scene {
 	}
 
 	update(time, delta) {
+		// // console.log(`delta: ${delta}, cdelta: ${time - this.lastTime}`);
+		// delta = time - this.lastTime;
+		// this.lastTime = time;
+
 		this.bullets.getChildren().forEach(b => {
 			this.objects.getChildren().forEach(o => {
 				if (inCircle(o.getBounds(), b.getBounds().centerX, b.getBounds().centerY)) {
@@ -180,22 +185,22 @@ class MainScene extends Phaser.Scene {
 			});
 		});
 
-		if (time > this.lastCreatedObstacle + conf.obstacleCreationRate * 1000) {
+		if (time > this.nextObstacle) {
 			let obstacle = new Obstacle(this);
 			this.objects.add(obstacle, true);
-			this.lastCreatedObstacle = time;
+			this.nextObstacle = time + rand(conf.obstacleCreationRate) * 1000;
 		}
 
-		if (time > this.lastCreatedPowerUp + conf.powerUpCreationRate * 1000) {
+		if (time > this.nextPowerUp) {
 			let powerUp = new PowerUp(this);
 			this.objects.add(powerUp, true);
-			this.lastCreatedPowerUp = time;
+			this.nextPowerUp = time + rand(conf.powerUpCreationRate) * 1000;
 		}
 
-		if (time > this.lastCreatedScrew + conf.screwCreationRate * 1000) {
+		if (time > this.nextScrew) {
 			let screw = new Screw(this);
 			this.objects.add(screw, true);
-			this.lastCreatedScrew = time;
+			this.nextScrew = time + rand(conf.screwCreationRate) * 1000;
 		}
 
 		this.robot.update(delta);

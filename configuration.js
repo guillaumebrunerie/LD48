@@ -19,7 +19,7 @@ conf.lineY = 120;
 conf.astronautY = 240;
 
 // The robot
-conf.robotSpeed = 0.001;
+conf.robotSpeed = 2;
 conf.angleMax = 0.3;
 conf.robotY = 520;
 conf.robotRadius = 1000;
@@ -37,7 +37,7 @@ conf.clawSpeed = 1;
 conf.clawPullbackSpeed = 0.5;
 
 // Obstacles
-conf.obstacleCreationRate = 3;
+conf.obstacleCreationRate = {min: 1, max: 3};
 
 conf.obstacles = [
 	{name: "Asteroid_01", scale: {min: 0.5, max: 1}},
@@ -52,7 +52,7 @@ conf.obstacleDefault = {
 };
 
 // Powerups
-conf.powerUpCreationRate = 6;
+conf.powerUpCreationRate = {min: 5, max: 10};
 
 conf.powerUps = [
 	{name: "Laser"},
@@ -69,7 +69,7 @@ conf.powerUpDefault = {
 };
 
 // Screws
-conf.screwCreationRate = 5;
+conf.screwCreationRate = {min: 10, max: 30};
 
 conf.screws = [
 	{name: "Screw", speedX: {min: -0.1, max: 0.1}, speedY: {min: -0.1, max: -0.4}, speedR: {min: -0.001, max: 0.001}, scale: 1}

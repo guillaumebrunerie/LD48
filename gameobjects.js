@@ -126,7 +126,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 	update(delta) {
 		if (!this.charging)
-			this.position += this.speed * delta;
+			this.position += this.speed * delta / 1000;
 		if (this.position > 1) {
 			this.position = 1;
 			this.speed = -this.speed;
@@ -136,7 +136,13 @@ class Robot extends Phaser.GameObjects.Container {
 			this.speed = -this.speed;
 		}
 
-		let easedPosition = Math.sin(Math.PI/2 * this.position);
+		let easingFactor = 3;
+		let easingThreshold = 1 - 1 / (2 * easingFactor);
+		let easedPosition = this.position;
+		// if (this.position >= easingThreshold)
+		// 	easedPosition = 1 - easingFactor * Math.pow(this.position - 1, 2);
+		// if (this.position <= -easingThreshold)
+		// 	easedPosition = - 1 + easingFactor * Math.pow(this.position + 1, 2);
 
 		let angle = easedPosition * this.angleMax;
 		this.y = this.centerY + this.radius * Math.cos(angle);
