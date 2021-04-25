@@ -16,7 +16,7 @@ class MainScene extends Phaser.Scene {
 		this.load.image("Bg", "Bg/Bg.jpg");
 
 		this.load.setPath("assets/Robot");
-		this.load.image(["Robot", "Robot_Hand"]);
+		this.load.image(["Robot", "Robot_Hand", "Robot_Line"]);
 		this.load.setPath("assets/Robot/RobotEyesFocus");
 		let eyeAnimationData = [];
 		for (let i = 0; i < 24; i++) {
@@ -200,7 +200,7 @@ class MainScene extends Phaser.Scene {
 			if (h.pullingBack)
 				return;
 			this.objects.getChildren().forEach(p => {
-				if (inCircle(p.getBounds(), h.getBounds().centerX, h.getBounds().centerY)) {
+				if (inCircle(p.getBounds(), h.x, h.y)) {
 					h.pullback();
 					p.pullback(h);
 				}

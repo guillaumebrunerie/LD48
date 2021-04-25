@@ -211,9 +211,16 @@ class Bullet extends Phaser.GameObjects.Sprite {
 	}
 }
 
-class Hand extends Phaser.GameObjects.Sprite {
+class Hand extends Phaser.GameObjects.Container {
 	constructor (scene, x, y, angle) {
-		super(scene, x, y, "Robot_Hand");
+		super(scene, x, y);
+
+		let hand = this.hand = scene.add.sprite(0, 0, "Robot_Hand");
+		this.add(hand);
+
+		let line = this.line = scene.add.sprite(0, 0, "Robot_Line").setOrigin(0.5, 1);
+		this.add(line);
+
 		this.pullingBack = false;
 		this.speedX = conf.handSpeed * Math.cos(angle);
 		this.speedY = conf.handSpeed * Math.sin(angle);
@@ -226,6 +233,8 @@ class Hand extends Phaser.GameObjects.Sprite {
 
 		this.x += this.speedX * delta;
 		this.y += this.speedY * delta;
+
+		this.rotation = Math.atan2(this.y - this.scene.robot.y, this.x - this.scene.robot.x) - Math.PI/2;
 
 		if (this.y < this.scene.robot.y) {
 			this.scene.robot.ungrab();
