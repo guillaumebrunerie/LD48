@@ -109,22 +109,25 @@ class Robot extends Phaser.GameObjects.Container {
 		this.add(hand);
 		this.hand = hand;
 
-		let robot = scene.add.sprite(0, 0, "Robot");
+		let robot = scene.add.sprite(0, conf.bodyY, "Robot");
 		this.add(robot);
 
-		this.eyes = scene.add.sprite(0, conf.eyesY, "RobotEyes_000");
-		this.add(this.eyes);
-
-		this.weaponContainer = scene.add.container(0, 0);
+		this.weaponContainer = scene.add.container(0, -conf.headOriginY);
 		this.add(this.weaponContainer);
 
-		this.shootingRange = scene.add.sprite(0, conf.shootingRangeY, "RobotShootingRange");
+		this.head = scene.add.sprite(0, conf.headOriginY + conf.headY, "Robot_Head");
+		this.weaponContainer.add(this.head);
+
+		this.eyes = scene.add.sprite(0, conf.headOriginY + conf.eyesY, "RobotEyes_000");
+		this.weaponContainer.add(this.eyes);
+
+		this.shootingRange = scene.add.sprite(0, conf.headOriginY + conf.shootingRangeY, "RobotShootingRange");
 		this.shootingRange.setOrigin(0.5, 0.05);
 		this.shootingRange.setAlpha(1);
 		this.shootingRange.visible = false;
 		this.weaponContainer.add(this.shootingRange);
 
-		this.laser = scene.add.sprite(0, conf.laserY, "RobotLaser")
+		this.laser = scene.add.sprite(0, conf.headOriginY + conf.laserY, "RobotLaser")
 			.setOrigin(0.5, 0)
 			.setVisible(false);
 		this.weaponContainer.add(this.laser);
@@ -143,7 +146,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		this.charging = false;
 		this.chargingLevel = 0;
-		// this.hasLaser = true;
+//		this.hasLaser = true;
 	}
 
 	update(time, delta) {
@@ -218,6 +221,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.isLasering = false;
 		this.laser.visible = false;
 		this.shootingRange.visible = false;
+		this.weaponContainer.rotation = 0;
 		this.charging = false;
 		this.eyes.stop();
 		this.eyes.setTexture("RobotEyes_000");

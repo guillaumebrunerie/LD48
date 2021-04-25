@@ -29,6 +29,9 @@ conf.robotY = 540;
 conf.robotRadius = 1000;
 conf.handY = 40;
 conf.eyesY = -8;
+conf.bodyY = 20;
+conf.headY = -30;
+conf.headOriginY = 50;
 
 // Shooting beam
 conf.beamAngle = 0.3;
