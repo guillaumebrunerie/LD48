@@ -38,7 +38,12 @@ class MainScene extends Phaser.Scene {
 		this.load.image("Shield2", "Fx/ShieldBubble.png");
 
 		this.load.setPath("assets/Bg");
-		this.load.image([{key: "Bg", url: "Bg.jpg"}, {key: "BgLong", url: "BgLong.jpg"}, "BgStars", "BgStars2"]);
+		this.load.image([
+			{key: "Bg", url: "Bg.jpg"},
+			{key: "BgLong", url: "BgLong.jpg"},
+			"BgStars", "BgStars2",
+			"BgPlanet_01", "BgPlanet_02", "BgPlanet_03", "BgPlanet_04"
+		]);
 
 		this.load.setPath("assets/Robot");
 		this.load.image(["Robot", "Robot_Hand", "Robot_Line", "RobotShootingRange"]);
@@ -77,23 +82,29 @@ class MainScene extends Phaser.Scene {
 		this.load.audio([]);
 	}
 
-	// makeParallaxImage(key, duration, dy) {
-	// 	let image = this.add.image(0
-	// 	this.tweens.add({
-	// 		targets: image,
-	// 		y: -dy,
-	// 		duration: duration,
-	// 		repeat: -1,
-	// 	});
-	// }
+	makeParallaxImage(x, y, key, repeat, dy, duration, props) {
+		for (let i = -1; i < repeat; i++) {
+			let image = this.add.image(x, y, key);
+			if (props && props.scale) image.setScale(props.scale);
+			if (dy === null)
+				dy = image.height;
+			image.y = y + dy * i;
+			this.tweens.add({
+				targets: image,
+				y: image.y - dy,
+				duration: duration,
+				repeat: -1,
+			});
+		}
+	}
 
 	create() {
 		// Background
-		this.add.image(0, 0, "Bg").setOrigin(0, 0).setDepth(-10);
-		// let bg = this.add.image(0, 0, "BgLong")
-		// 	.setOrigin(0, 0)
-		// 	.setScale(1080/196)
-		// 	.setDepth(-10);
+		// this.add.image(0, 0, "Bg").setOrigin(0, 0).setDepth(-10);
+		let bg = this.add.image(0, 0, "BgLong")
+			.setOrigin(0, 0)
+			.setScale(1080/196)
+			.setDepth(-10);
 		// let bgFlip = this.add.image(0, 0, "BgLong")
 		// 	.setOrigin(0, 0)
 		// 	.setScale(1080/196, -1080/196)
@@ -107,6 +118,13 @@ class MainScene extends Phaser.Scene {
 		// 	.setDepth(-10)
 		// 	.setPosition(0, this.bg.getBounds().height);
 		// let bgStars = this.add.image(this.scale.width / 2, this.scale.height / 2, "BgStars");
+
+		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars", 2, null, 10000);
+		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars2", 2, null, 20000);
+		// this.makeParallaxImage(200, 2000, "BgPlanet_01", 2, 2000, 15000, {scale: 0.1});
+		// this.makeParallaxImage(400, 1500, "BgPlanet_02", 2, 2000, 15000, {scale: 0.1});
+		// this.makeParallaxImage(600, 1000, "BgPlanet_03", 2, 2000, 15000, {scale: 0.1});
+		// this.makeParallaxImage(800, 500, "BgPlanet_04", 2, 2000, 15000, {scale: 0.1});
 
 		// Inventory
 		this.screwContainer = this.add.container(conf.inventoryX, conf.inventoryY)
