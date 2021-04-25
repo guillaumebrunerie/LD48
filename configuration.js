@@ -34,9 +34,9 @@ conf.beamSpeed = 2.5;
 conf.bulletSpeed = 2;
 conf.reloadDelay = 0;
 
-// Claw
-conf.clawSpeed = 1;
-conf.clawPullbackSpeed = 0.5;
+// Hand
+conf.handSpeed = 1;
+conf.handPullbackSpeed = 0.5;
 
 // Obstacles
 conf.obstacleCreationRate = {min: 1, max: 3};

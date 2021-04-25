@@ -92,6 +92,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		let hand = scene.add.sprite(0, conf.handY, "Robot_Hand");
 		this.add(hand);
+		this.hand = hand;
 
 		let robot = scene.add.sprite(0, 0, "Robot");
 		this.add(robot);
@@ -129,7 +130,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.timeCharging = 0;
 	}
 
-	update(delta) {
+	update(time, delta) {
 		if (!this.charging)
 			this.position += this.speed * delta / 1000;
 		if (this.position > 1) {
@@ -180,6 +181,14 @@ class Robot extends Phaser.GameObjects.Container {
 		this.eyes.stop();
 		this.eyes.setTexture("RobotEyes_000");
 	}
+
+	grab() {
+		this.hand.visible = false;
+	}
+
+	ungrab() {
+		this.hand.visible = true;
+	}
 }
 
 class Bullet extends Phaser.GameObjects.Sprite {
@@ -202,13 +211,13 @@ class Bullet extends Phaser.GameObjects.Sprite {
 	}
 }
 
-class Claw extends Phaser.GameObjects.Sprite {
+class Hand extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y, angle) {
-		super(scene, x, y, "player");
-		this.scale = 0.2;
-		this.speedX = conf.clawSpeed * Math.cos(angle);
-		this.speedY = conf.clawSpeed * Math.sin(angle);
+		super(scene, x, y, "Robot_Hand");
 		this.pullingBack = false;
+		this.speedX = conf.handSpeed * Math.cos(angle);
+		this.speedY = conf.handSpeed * Math.sin(angle);
+		this.rotation = this.scene.robot.rotation;
 	}
 
 	update(time, delta) {
@@ -218,13 +227,26 @@ class Claw extends Phaser.GameObjects.Sprite {
 		this.x += this.speedX * delta;
 		this.y += this.speedY * delta;
 
-		if (this.getBounds().bottom < 0 || this.getBounds().top > this.scene.scale.height)
+		if (this.y < this.scene.robot.y) {
+			this.scene.robot.ungrab();
 			this.destroy();
+			return;
+		}
+
+		if (this.y > this.scene.scale.height) {
+			this.pullbackFast();
+		}
 	}
 
 	pullback() {
 		this.pullingBack = true;
 		this.speedX = -this.speedX;
 		this.speedY = -this.speedY;
+	}
+
+	pullbackFast() {
+		this.pullingBack = true;
+		this.speedX = -this.speedX * 3;
+		this.speedY = -this.speedY * 3;
 	}
 }

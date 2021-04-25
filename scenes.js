@@ -51,7 +51,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	create() {
-		this.add.image(0, 0, "Bg").setOrigin(0, 0);
+		this.add.image(0, 0, "Bg").setOrigin(0, 0).setDepth(-10);
 		this.screwContainer = this.add.container(conf.inventoryX, conf.inventoryY)
 			.setDepth(1)
 			.add(this.add.image(0, 0, "ScrewInventory"));
@@ -75,7 +75,7 @@ class MainScene extends Phaser.Scene {
 
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
-		this.claws = this.add.group({runChildUpdate: true, maxSize: 1});
+		this.hands = this.add.group({runChildUpdate: true, maxSize: 1});
 
 		this.robot = new Robot(this);
 		this.add.existing(this.robot);
@@ -91,8 +91,8 @@ class MainScene extends Phaser.Scene {
 
 		let tab = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
 
-		tab.on("down", () => this.down("claw"));
-		tab.on("up",   () => this.up("claw"));
+		tab.on("down", () => this.down("hand"));
+		tab.on("up",   () => this.up("hand"));
 
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
@@ -120,7 +120,7 @@ class MainScene extends Phaser.Scene {
 		if (!this.robot.charging)
 			return;
 		this.lastFired = this.time.now;
-		let weapon = e.position ? (e.position.x < this.scale.width / 2 ? "claw" : "default") : e;
+		let weapon = e.position ? (e.position.x < this.scale.width / 2 ? "hand" : "default") : e;
 		this.robot.up(weapon);
 		this.updateUI(null);
 	}
@@ -128,7 +128,7 @@ class MainScene extends Phaser.Scene {
 	updateUI(e) {
 		let weapon;
 		if (e && e.position)
-			weapon = (e.position.x < this.scale.width / 2) ? "claw" : "default";
+			weapon = (e.position.x < this.scale.width / 2) ? "hand" : "default";
 		else
 			weapon = e;
 
@@ -136,7 +136,7 @@ class MainScene extends Phaser.Scene {
 		this.uiRight.setAlpha(0.2);
 		if (weapon == "default")
 			this.uiRight.setAlpha(0.4);
-		else if (weapon == "claw")
+		else if (weapon == "hand")
 			this.uiLeft.setAlpha(0.4);
 	}
 
@@ -196,13 +196,13 @@ class MainScene extends Phaser.Scene {
 			});
 		});
 
-		this.claws.getChildren().forEach(c => {
-			if (c.pullingBack)
+		this.hands.getChildren().forEach(h => {
+			if (h.pullingBack)
 				return;
 			this.objects.getChildren().forEach(p => {
-				if (inCircle(p.getBounds(), c.getBounds().centerX, c.getBounds().centerY)) {
-					c.pullback();
-					p.pullback(c);
+				if (inCircle(p.getBounds(), h.getBounds().centerX, h.getBounds().centerY)) {
+					h.pullback();
+					p.pullback(h);
 				}
 			});
 		});
@@ -225,7 +225,7 @@ class MainScene extends Phaser.Scene {
 			this.nextScrew = time + rand(conf.screwCreationRate) * 1000;
 		}
 
-		this.robot.update(delta);
+		this.robot.update(time, delta);
 	}
 
 	fire(x, y, angle, weapon) {
@@ -233,8 +233,9 @@ class MainScene extends Phaser.Scene {
 			case "default":
 				this.bullets.add(new Bullet(this, x, y, angle), true);
 				break;
-			case "claw":
-				this.claws.add(new Claw(this, x, y, angle), true);
+			case "hand":
+				this.robot.grab();
+				this.hands.add(new Hand(this, x, y, angle), true).setDepth(-1);
 				break;
 		}
 	}
