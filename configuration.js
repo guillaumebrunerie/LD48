@@ -21,7 +21,7 @@ conf.astronautY = 240;
 // The robot
 conf.robotSpeed = 2;
 conf.angleMax = 0.3;
-conf.robotY = 520;
+conf.robotY = 540;
 conf.robotRadius = 1000;
 conf.handY = 40;
 conf.eyesY = -8;

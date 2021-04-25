@@ -257,10 +257,16 @@ class Hand extends Phaser.GameObjects.Container {
 			this.pullbackFast();
 		}
 
-		if (dx > dy)
+		if (dx > dy) {
 			this.x -= (dx - dy);
-		if (dx < -dy)
-			this.x += (-dy -dx);
+			if (this.scene.pulledObject)
+				this.scene.pulledObject.x -= (dx - dy);
+		}
+		if (dx < -dy) {
+			this.x -= (dx + dy);
+			if (this.scene.pulledObject)
+				this.scene.pulledObject.x -= (dx + dy);
+		}
 	}
 
 	pullback() {
