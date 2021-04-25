@@ -18,6 +18,9 @@ class StartScene extends Phaser.Scene {
 		this.load.image("Shield1", "Fx/ShieldBubble2.png");
 		this.load.image("Shield2", "Fx/ShieldBubble.png");
 
+		this.load.setPath("assets/Fx/ExplosionDefault");
+		this.loadPNGSequence("ExplosionDefault", 6);
+
 		this.load.setPath("assets/Bg");
 		this.load.image([
 			{key: "Bg", url: "Bg.jpg"},
@@ -73,8 +76,18 @@ class StartScene extends Phaser.Scene {
 		startButton.isDown = false;
 
 		startButton.setInteractive();
-		startButton.on("pointerdown", () => {startButton.isDown = true;});
-		startButton.on("pointerup", () => {if (startButton.isDown) this.scene.start("MainScene");});
+		startButton.on("pointerdown", () => {
+			startButton.isDown = true;
+			startButton.scale = 1.1;
+		});
+		startButton.on("pointerout", () => {
+			startButton.isDown = false;
+			startButton.scale = 1;
+		});
+		startButton.on("pointerup", () => {
+			if (startButton.isDown)
+				this.scene.start("MainScene");
+		});
 	}
 }
 
@@ -178,6 +191,8 @@ class MainScene extends Phaser.Scene {
 		this.add.existing(this.robot);
 
 		this.pulledObject = null;
+
+		this.createPNGSequence("ExplosionDefault", 6);
 
 		// Objects and more
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 100});
@@ -311,7 +326,7 @@ class MainScene extends Phaser.Scene {
 		this.bullets.getChildren().forEach(b => {
 			this.objects.getChildren().forEach(o => {
 				if (inCircle(o.getBounds(), b.getBounds().centerX, b.getBounds().centerY)) {
-					o.destroy();
+					o.explode();
 					b.destroy();
 				}
 			});
@@ -348,48 +363,5 @@ class MainScene extends Phaser.Scene {
 		}
 
 		this.robot.update(time, delta);
-	}
-
-	fullCharge() {
-		this.robot.chargingLevel = 0;
-
-		this.robot.shootingRange.visible = false;
-		this.robot.eyes.stop();
-		this.robot.eyes.setTexture("RobotEyes_000");
-
-		this.uiContainer.setAlpha(0);
-		this.tweens.killTweensOf(this.uiContainer);
-		this.updateUI(null);
-
-		if (this.hasLaser)
-			this.fireLaser();
-		else
-			this.robot.charging = false;
-	}
-
-	fireLaser() {
-		let laserC = this.add.container(this.robot.x, this.robot.y)
-				.setRotation(this.robot.rotation);
-		let laser = this.add.sprite(0, conf.laserY, "RobotLaser")
-				.setOrigin(0.5, 0);
-		laserC.add(laser);
-		laser.play({key: "RobotLaser", hideOnComplete: true})
-			.on("animationcomplete", () => this.robot.charging = false);
-
-		let line = new Phaser.Geom.Line(
-			this.robot.x,
-			this.robot.y,
-			this.robot.x - Math.sin(this.robot.rotation) * 3000,
-			this.robot.y + Math.cos(this.robot.rotation) * 3000,
-		);
-
-		let objects = this.objects.getChildren().slice();
-		objects.forEach(o => {
-			let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height) / 3);
-			let result = Phaser.Geom.Intersects.LineToCircle(line, circle);
-			if (result) {
-				o.destroy();
-			}
-		});
 	}
 }

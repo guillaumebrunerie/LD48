@@ -40,6 +40,10 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 	}
 
 	collect() {}
+
+	explode() {
+		this.destroy();
+	}
 }
 
 class Obstacle extends DriftingThing {
@@ -51,6 +55,14 @@ class Obstacle extends DriftingThing {
 
 	collect() {
 		this.scene.loseLife();
+	}
+
+	explode() {
+		if (!this.isExploding) {
+			this.isExploding = true;
+			this.play("ExplosionDefault");
+			this.on("animationcomplete", () => this.destroy());
+		}
 	}
 }
 
@@ -181,7 +193,7 @@ class Robot extends Phaser.GameObjects.Container {
 				let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height) / 3);
 				let result = Phaser.Geom.Intersects.LineToCircle(line, circle);
 				if (result) {
-					o.destroy();
+					o.explode();
 				}
 			});
 		}
