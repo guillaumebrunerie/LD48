@@ -77,16 +77,33 @@ class StartScene extends Phaser.Scene {
 
 		startButton.setInteractive();
 		startButton.on("pointerdown", () => {
+			this.tweens.add({
+				targets: startButton,
+				scale: 1.1,
+				rotation: -0.1,
+				duration: 100,
+			});
 			startButton.isDown = true;
-			startButton.scale = 1.1;
 		});
 		startButton.on("pointerout", () => {
 			startButton.isDown = false;
-			startButton.scale = 1;
+			this.tweens.add({
+				targets: startButton,
+				scale: 1,
+				rotation: 0,
+				duration: 100,
+			});
 		});
 		startButton.on("pointerup", () => {
-			if (startButton.isDown)
-				this.scene.start("MainScene");
+			if (startButton.isDown) {
+				this.tweens.add({
+					targets: startButton,
+					scale: 1,
+					rotation: 0,
+					duration: 100,
+					onComplete: () => this.scene.start("MainScene"),
+				});
+			}
 		});
 	}
 }
