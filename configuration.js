@@ -9,10 +9,10 @@ conf.screwdX = 62;
 
 // The buttons
 conf.uiY = 1700;
-conf.uiLeftX = -180;
-conf.uiLeftY = 0;
-conf.uiRightX = 180;
-conf.uiRightY = 0;
+conf.uiLeftX = 0;
+conf.uiLeftY = -180;
+conf.uiRightX = 0;
+conf.uiRightY = 180;
 
 // The astronaut
 conf.lineY = 120;

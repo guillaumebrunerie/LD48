@@ -73,38 +73,52 @@ class MainScene extends Phaser.Scene {
 	}
 
 	create() {
+		// Background
 		this.add.image(0, 0, "Bg").setOrigin(0, 0).setDepth(-10);
+
+		// Inventory
 		this.screwContainer = this.add.container(conf.inventoryX, conf.inventoryY)
 			.setDepth(1)
 			.add(this.add.image(0, 0, "ScrewInventory"));
+
+		// Astronaut
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
 		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
 		this.shield = this.add.image(this.scale.width / 2, conf.astronautY, "Shield2");
-		this.uiContainer = this.add.container(this.scale.width / 2, conf.uiY)
-			.setDepth(1);
-		this.uiSocket = this.add.image(0, 0, "UI_Controls");
+
+		// UI
+		this.uiContainer = this.add.container(0, 0)
+			.setDepth(1).setVisible(false);
+		this.uiSocket = this.add.image(0, 0, "UI_Controls").setRotation(Math.PI/2);
 		this.uiLeft = this.add.image(conf.uiLeftX, conf.uiLeftY, "UI_Hand")
 			.setAlpha(0.2);
 		this.uiRight = this.add.image(conf.uiRightX, conf.uiRightY, "UI_Shoot")
 			.setAlpha(0.2);
 		this.uiContainer.add([this.uiSocket, this.uiLeft, this.uiRight]);
 
+		// Robot
 		this.createPNGSequence("RobotEyes", 24, {frameRate: 30});
 		this.createPNGSequence("RobotHandGrab", 5);
 		this.createPNGSequence("RobotHandStart", 8);
 		this.createPNGSequence("RobotShot", 13, {repeat: -1});
 
+		this.robot = new Robot(this);
+		this.add.existing(this.robot);
+
+		this.pulledObject = null;
+
+		// Objects and more
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
 		this.hands = this.add.group({runChildUpdate: true, maxSize: 1});
-
-		this.robot = new Robot(this);
-		this.add.existing(this.robot);
 
 		this.nextObstacle = this.time.now;
 		this.nextPowerUp = this.time.now + 5000;
 		this.nextScrew = this.time.now + 30000;
 
+		this.collectedScrews = 0;
+
+		// Input
 		let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
 		spaceBar.on("down", () => this.down("default"));
@@ -118,11 +132,6 @@ class MainScene extends Phaser.Scene {
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
 		this.input.on("pointermove", (e) => this.move(e));
-
-		this.collectedScrews = 0;
-		this.lastTime = this.time.now;
-
-		this.pulledObject = null;
 	}
 
 	move(e) {
@@ -135,6 +144,8 @@ class MainScene extends Phaser.Scene {
 	down(e) {
 		if (this.time.now < this.lastFired + conf.reloadDelay * 1000)
 			return;
+
+		this.downPosition = {x: e.position.x, y: e.position.y};
 		this.robot.down();
 		this.updateUI(e);
 	}
@@ -143,7 +154,7 @@ class MainScene extends Phaser.Scene {
 		if (!this.robot.charging)
 			return;
 		this.lastFired = this.time.now;
-		let weapon = e.position ? (e.position.x < this.scale.width / 2 ? "hand" : "default") : e;
+		let weapon = e.position ? ((this.downPosition.y - e.position.y > 100) ? "hand" : "default") : e;
 		this.robot.up(weapon);
 		this.updateUI(null);
 	}
@@ -151,10 +162,13 @@ class MainScene extends Phaser.Scene {
 	updateUI(e) {
 		let weapon;
 		if (e && e.position)
-			weapon = (e.position.x < this.scale.width / 2) ? "hand" : "default";
+			weapon = (this.downPosition.y - e.position.y > 100) ? "hand" : "default";
 		else
 			weapon = e;
 
+		this.uiContainer.setVisible(!!e);
+		this.uiContainer.x = this.downPosition.x;
+		this.uiContainer.y = this.downPosition.y - 200;
 		this.uiLeft.setAlpha(0.2);
 		this.uiRight.setAlpha(0.2);
 		if (weapon == "default")
