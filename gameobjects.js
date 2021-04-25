@@ -222,6 +222,12 @@ class Hand extends Phaser.GameObjects.Container {
 		let line = this.line = scene.add.sprite(0, 0, "Robot_Line").setOrigin(0.5, 1);
 		this.add(line);
 
+		const shape = this.scene.make.graphics();
+		shape.fillStyle(0xffffff);
+		shape.beginPath();
+		shape.fillRect(0, conf.robotY, this.scene.scale.width, this.scene.scale.height);
+		line.setMask(shape.createGeometryMask());
+
 		this.pullingBack = false;
 		this.speedX = conf.handSpeed * Math.cos(angle);
 		this.speedY = conf.handSpeed * Math.sin(angle);
