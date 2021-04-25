@@ -169,7 +169,6 @@ class MainScene extends Phaser.Scene {
 				if (inCircle(o.getBounds(), b.getBounds().centerX, b.getBounds().centerY)) {
 					o.destroy();
 					b.destroy();
-					window.navigator.vibrate(50);
 				}
 			});
 		});
