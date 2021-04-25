@@ -6,6 +6,28 @@ class MainScene extends Phaser.Scene {
 		this.shieldLevel = 2;
 	}
 
+	loadPNGSequence(name, duration) {
+		for (let i = 0; i < duration; i++) {
+			let istr = ("000" + i).substr(-3);
+			let key = name + "_" + istr;
+			this.load.image(key);
+		}
+	}
+
+	createPNGSequence(name, duration, props) {
+		let frames = [];
+		for (let i = 0; i < duration; i++) {
+			let istr = ("000" + i).substr(-3);
+			let key = name + "_" + istr;
+			frames.push({key, frame: 0});
+		}
+
+		this.anims.create(Object.assign({
+			key: name,
+			frames,
+		}, props));
+	}
+
 	preload() {
 		this.load.setPath("assets");
 		this.load.image("player");
@@ -18,15 +40,11 @@ class MainScene extends Phaser.Scene {
 		this.load.setPath("assets/Robot");
 		this.load.image(["Robot", "Robot_Hand", "Robot_Line"]);
 		this.load.setPath("assets/Robot/RobotEyesFocus");
-		let eyeAnimationData = [];
-		for (let i = 0; i < 24; i++) {
-			let istr = ("000" + i).substr(-3);
-			let key = "RobotEyes_" + istr;
-			this.load.image(key);
-			eyeAnimationData.push({key, frame: 0});
-		}
-
-		this.eyeAnimationData = eyeAnimationData;
+		this.loadPNGSequence("RobotEyes", 24);
+		this.load.setPath("assets/Robot/RobotHandGrab");
+		this.loadPNGSequence("RobotHandGrab", 5);
+		this.load.setPath("assets/Robot/RobotHandStart");
+		this.loadPNGSequence("RobotHandStart", 8);
 
 		this.load.setPath("assets");
 
@@ -67,11 +85,9 @@ class MainScene extends Phaser.Scene {
 			.setAlpha(0.2);
 		this.uiContainer.add([this.uiSocket, this.uiLeft, this.uiRight]);
 
-		this.anims.create({
-			key: "EyesFocus",
-			frames: this.eyeAnimationData,
-			frameRate: 30,
-		});
+		this.createPNGSequence("RobotEyes", 24, {frameRate: 30});
+		this.createPNGSequence("RobotHandGrab", 5);
+		this.createPNGSequence("RobotHandStart", 8);
 
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});

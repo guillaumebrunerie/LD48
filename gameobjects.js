@@ -167,7 +167,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.beam2.visible = true;
 		this.charging = true;
 		this.timeCharging = 0;
-		this.eyes.play("EyesFocus");
+		this.eyes.play("RobotEyes");
 	}
 
 	up(weapon) {
@@ -217,6 +217,7 @@ class Hand extends Phaser.GameObjects.Container {
 
 		let hand = this.hand = scene.add.sprite(0, 0, "Robot_Hand");
 		this.add(hand);
+		this.hand.play("RobotHandStart");
 
 		let line = this.line = scene.add.sprite(0, 0, "Robot_Line").setOrigin(0.5, 1);
 		this.add(line);
@@ -251,6 +252,7 @@ class Hand extends Phaser.GameObjects.Container {
 		this.pullingBack = true;
 		this.speedX = -this.speedX;
 		this.speedY = -this.speedY;
+		this.hand.play("RobotHandGrab");
 	}
 
 	pullbackFast() {
