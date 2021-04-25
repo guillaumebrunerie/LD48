@@ -1,5 +1,8 @@
 conf = {};
 
+// The start screen
+conf.startButtonY = 1600;
+
 // The inventory
 conf.inventoryX = 150;
 conf.inventoryY = 80;
@@ -13,6 +16,7 @@ conf.uiLeftX = 0;
 conf.uiLeftY = -180;
 conf.uiRightX = 0;
 conf.uiRightY = 180;
+conf.uiYSwitch = 300;
 
 // The astronaut
 conf.lineY = 120;
@@ -29,7 +33,8 @@ conf.eyesY = -8;
 // Shooting beam
 conf.beamAngle = 0.3;
 conf.beamSpeed = 3.5;
-conf.shootingRangeY = -100;
+conf.shootingRangeY = 0;
+conf.shootingRangeAdjustment = 2000;
 
 // Bullets
 conf.bulletSpeed = 2;
@@ -49,7 +54,10 @@ conf.obstacleCreationRate = {min: 1, max: 3};
 
 conf.obstacles = [
 	{name: "Asteroid_01", scale: {min: 0.5, max: 1}},
-	{name: "Asteroid_02", scale: {min: 0.8, max: 1.4}}
+	{name: "Asteroid_02", scale: {min: 0.8, max: 1.4}},
+	{name: "Asteroid_03", scale: {min: 0.8, max: 1.4}},
+	{name: "Small_Asteroid_01", scale: {min: 0.8, max: 1.4}},
+	{name: "Small_Asteroid_02", scale: {min: 0.8, max: 1.4}}
 ];
 
 conf.obstacleDefault = {
@@ -63,6 +71,8 @@ conf.obstacleDefault = {
 conf.powerUpCreationRate = {min: 2, max: 5};
 
 conf.powerUps = [
+	{name: "Laser"},
+	{name: "Laser"},
 	{name: "Laser"},
 	{name: "Magnet"},
 	{name: "Shield", speed: {min: 0.4, max: 0.6}},

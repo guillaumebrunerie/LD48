@@ -1,11 +1,6 @@
-class MainScene extends Phaser.Scene {
+class StartScene extends Phaser.Scene {
 	constructor() {
-		super("MainScene");
-
-		this.lastFired = 0;
-		this.shieldLevel = 2;
-
-		window.scene = this;
+		super("StartScene");
 	}
 
 	loadPNGSequence(name, duration) {
@@ -14,20 +9,6 @@ class MainScene extends Phaser.Scene {
 			let key = name + "_" + istr;
 			this.load.image(key);
 		}
-	}
-
-	createPNGSequence(name, duration, props) {
-		let frames = [];
-		for (let i = 0; i < duration; i++) {
-			let istr = ("000" + i).substr(-3);
-			let key = name + "_" + istr;
-			frames.push({key, frame: 0});
-		}
-
-		this.anims.create(Object.assign({
-			key: name,
-			frames,
-		}, props));
 	}
 
 	preload() {
@@ -80,6 +61,45 @@ class MainScene extends Phaser.Scene {
 
 		this.load.setPath("audio");
 		this.load.audio([]);
+
+		this.load.setPath("assets/UI");
+		this.load.image("StartScreen");
+		this.load.image("StartButton");
+	}
+
+	create() {
+		this.add.image(0, 0, "StartScreen").setOrigin(0, 0);
+		let startButton = this.add.image(this.scale.width / 2, conf.startButtonY, "StartButton");
+		startButton.isDown = false;
+
+		startButton.setInteractive();
+		startButton.on("pointerdown", () => {startButton.isDown = true;});
+		startButton.on("pointerup", () => {if (startButton.isDown) this.scene.start("MainScene");});
+	}
+}
+
+class MainScene extends Phaser.Scene {
+	constructor() {
+		super("MainScene");
+
+		this.lastFired = 0;
+		this.shieldLevel = 2;
+
+		window.scene = this;
+	}
+
+	createPNGSequence(name, duration, props) {
+		let frames = [];
+		for (let i = 0; i < duration; i++) {
+			let istr = ("000" + i).substr(-3);
+			let key = name + "_" + istr;
+			frames.push({key, frame: 0});
+		}
+
+		this.anims.create(Object.assign({
+			key: name,
+			frames,
+		}, props));
 	}
 
 	makeParallaxImage(x, y, key, repeat, dy, duration, props) {
@@ -170,26 +190,34 @@ class MainScene extends Phaser.Scene {
 
 		this.collectedScrews = 0;
 
-		// Input
-		let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+		// // Input
+		// let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-		spaceBar.on("down", () => this.down("default"));
-		spaceBar.on("up",   () => this.up("default"));
+		// spaceBar.on("down", () => this.down("default"));
+		// spaceBar.on("up",   () => this.up("default"));
 
-		let tab = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
+		// let tab = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
 
-		tab.on("down", () => this.down("hand"));
-		tab.on("up",   () => this.up("hand"));
+		// tab.on("down", () => this.down("hand"));
+		// tab.on("up",   () => this.up("hand"));
 
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
 		this.input.on("pointermove", (e) => this.move(e));
 	}
 
+	getWeaponFromEvent(e) {
+		if (!e)
+			return e;
+		return e.position ? ((this.downPosition.y - e.position.y > conf.uiYSwitch) ? "hand" : "default") : e;
+	}
+
 	move(e) {
 		if (!this.robot.charging)
 			return;
 
+		this.robot.move(this.getWeaponFromEvent(e));
+		this.robot.weaponContainer.rotation = (this.downPosition.x - e.position.x) / conf.shootingRangeAdjustment;
 		this.updateUI(e);
 	}
 
@@ -209,10 +237,11 @@ class MainScene extends Phaser.Scene {
 	}
 
 	up(e) {
-		if (!this.robot.charging)
+		if (!this.robot.charging && !this.robot.isLasering)
 			return;
+
 		this.lastFired = this.time.now;
-		let weapon = e.position ? ((this.downPosition.y - e.position.y > 100) ? "hand" : "default") : e;
+		let weapon = this.getWeaponFromEvent(e);
 		this.robot.up(weapon);
 		this.uiContainer.setAlpha(0);
 		this.tweens.killTweensOf(this.uiContainer);
@@ -220,11 +249,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	updateUI(e) {
-		let weapon;
-		if (e && e.position)
-			weapon = (this.downPosition.y - e.position.y > 100) ? "hand" : "default";
-		else
-			weapon = e;
+		let weapon = this.getWeaponFromEvent(e);
 
 		this.uiContainer.x = this.downPosition.x;
 		this.uiContainer.y = this.downPosition.y - 200;
@@ -323,18 +348,6 @@ class MainScene extends Phaser.Scene {
 		}
 
 		this.robot.update(time, delta);
-	}
-
-	fire(x, y, angle, weapon) {
-		switch (weapon) {
-			case "default":
-				this.bullets.add(new Bullet(this, x, y, angle), true);
-				break;
-			case "hand":
-				this.robot.grab();
-				this.hands.add(new Hand(this, x, y, angle), true).setDepth(-1);
-				break;
-		}
 	}
 
 	fullCharge() {

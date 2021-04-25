@@ -20,7 +20,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.rotation += delta * this.speedR;
 
 		if (this.getBounds().bottom < 0) {
-			if (this.isPulledBack && this.collect)
+			if (this.isPulledBack)
 				this.collect();
 			this.destroy();
 		}
@@ -38,6 +38,8 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.speedX = -speed * Math.cos(angle);
 		this.speedY = -speed * Math.sin(angle);
 	}
+
+	collect() {}
 }
 
 class Obstacle extends DriftingThing {
@@ -60,7 +62,7 @@ class PowerUp extends DriftingThing {
 	collect() {
 		switch (this.type) {
 			case "Laser":
-				this.scene.hasLaser = true;
+				this.scene.robot.hasLaser = true;
 				break;
 			case "Magnet":
 				this.scene.magnetize();
@@ -101,11 +103,19 @@ class Robot extends Phaser.GameObjects.Container {
 		this.eyes = scene.add.sprite(0, conf.eyesY, "RobotEyes_000");
 		this.add(this.eyes);
 
+		this.weaponContainer = scene.add.container(0, 0);
+		this.add(this.weaponContainer);
+
 		this.shootingRange = scene.add.sprite(0, conf.shootingRangeY, "RobotShootingRange");
-		this.shootingRange.setOrigin(0.5, 0);
+		this.shootingRange.setOrigin(0.5, 0.05);
 		this.shootingRange.setAlpha(1);
 		this.shootingRange.visible = false;
-		this.add(this.shootingRange);
+		this.weaponContainer.add(this.shootingRange);
+
+		this.laser = scene.add.sprite(0, conf.laserY, "RobotLaser")
+			.setOrigin(0.5, 0)
+			.setVisible(false);
+		this.weaponContainer.add(this.laser);
 
 		// Track where the robot is
 		this.centerY = conf.robotY - conf.robotRadius;
@@ -121,6 +131,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		this.charging = false;
 		this.chargingLevel = 0;
+		// this.hasLaser = true;
 	}
 
 	update(time, delta) {
@@ -150,34 +161,81 @@ class Robot extends Phaser.GameObjects.Container {
 
 		if (this.charging) {
 			this.chargingLevel += delta / (1000 * this.beamSpeed * conf.beamAngle);
-			if (this.chargingLevel > 1) {
-				this.scene.fullCharge();
-			}
 			this.shootingRange.setScale(Math.max(4 * (1 - this.chargingLevel), 0.05), 4);
 			this.shootingRange.setAlpha(this.chargingLevel / 2);
+			if (this.chargingLevel > 1 && this.hasLaser && !this.isLasering) {
+				this.startLaser();
+			}
+		}
+
+		if (this.isLasering) {
+			let line = new Phaser.Geom.Line(
+				this.x,
+				this.y,
+				this.x - Math.sin(this.rotation + this.weaponContainer.rotation) * 3000,
+				this.y + Math.cos(this.rotation + this.weaponContainer.rotation) * 3000,
+			);
+
+			let objects = this.scene.objects.getChildren().slice();
+			objects.forEach(o => {
+				let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height) / 3);
+				let result = Phaser.Geom.Intersects.LineToCircle(line, circle);
+				if (result) {
+					o.destroy();
+				}
+			});
 		}
 	}
 
-	down() {
+	move(weapon) {
+		this.weapon = weapon;
+	}
+
+	down(weapon) {
+		this.weapon = weapon;
 		this.shootingRange.visible = true;
+		this.shootingRange.rotation = 0;
 		this.charging = true;
 		this.chargingLevel = 0;
-		this.eyes.play(this.scene.hasLaser ? "RobotLaserEyes" : "RobotEyes");
+		this.eyes.play(this.hasLaser ? "RobotLaserEyes" : "RobotEyes");
 	}
 
 	up(weapon) {
+		if (!this.isLasering)
+			this.fire(weapon);
+		this.isLasering = false;
+		this.laser.visible = false;
 		this.shootingRange.visible = false;
 		this.charging = false;
-
-		let firingAngle = this.rotation + Math.PI/2 + (1 - this.chargingLevel) * rand({min: -conf.beamAngle, max: conf.beamAngle});
-
-		this.scene.fire(this.x, this.y, firingAngle, weapon);
 		this.eyes.stop();
 		this.eyes.setTexture("RobotEyes_000");
 	}
 
-	grab() {
-		this.hand.visible = false;
+	fire(weapon) {
+		let angle =
+				this.rotation + this.weaponContainer.rotation + Math.PI/2
+				+ Math.max(0, 1 - this.chargingLevel) * rand({min: -conf.beamAngle, max: conf.beamAngle});
+
+		switch (weapon) {
+			case "default":
+				this.scene.bullets.add(new Bullet(this.scene, this.x, this.y, angle), true);
+				break;
+			case "hand":
+				this.hand.visible = false;
+				this.scene.hands.add(new Hand(this.scene, this.x, this.y, angle), true).setDepth(-1);
+				break;
+		}
+	}
+
+	startLaser() {
+		// let laserC = this.add.container(this.robot.x, this.robot.y)
+		// 		.setRotation(this.robot.rotation);
+		// let laser = this.add.sprite(0, conf.laserY, "RobotLaser")
+		// 		.setOrigin(0.5, 0);
+		// laserC.add(laser);
+		this.laser.visible = true;
+		this.laser.play({key: "RobotLaser"});
+		this.isLasering = true;
 	}
 
 	ungrab() {

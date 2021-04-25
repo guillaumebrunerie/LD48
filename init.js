@@ -12,5 +12,5 @@ new Phaser.Game({
 		width: 1080,
 		height: 1920,
 	},
-	scene: [MainScene],
+	scene: [StartScene, MainScene],
 });
