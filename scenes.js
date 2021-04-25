@@ -184,6 +184,7 @@ class MainScene extends Phaser.Scene {
 		// Astronaut
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
 		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
+
 		this.shield = this.add.image(this.scale.width / 2, conf.astronautY, "Shield2");
 
 		// UI

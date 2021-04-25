@@ -12,6 +12,8 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.speedX = rand(conf.speedX);
 		this.speedY = rand(conf.speedY);
 		this.speedR = rand(conf.speedR);
+
+		this.isObstacle = false;
 	}
 
 	update(time, delta) {
@@ -49,6 +51,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 class Obstacle extends DriftingThing {
 	constructor(scene) {
 		super(scene, pick(conf.obstacles));
+		this.isObstacle = true;
 	}
 
 	magnetize() {}
@@ -146,7 +149,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		this.charging = false;
 		this.chargingLevel = 0;
-//		this.hasLaser = true;
+		this.hasLaser = true;
 	}
 
 	update(time, delta) {
@@ -191,7 +194,7 @@ class Robot extends Phaser.GameObjects.Container {
 				this.y + Math.cos(this.rotation + this.weaponContainer.rotation) * 3000,
 			);
 
-			let objects = this.scene.objects.getChildren().slice();
+			let objects = this.scene.objects.getChildren().slice().filter(o => o.isObstacle);
 			objects.forEach(o => {
 				let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height) / 3);
 				let result = Phaser.Geom.Intersects.LineToCircle(line, circle);
@@ -204,6 +207,15 @@ class Robot extends Phaser.GameObjects.Container {
 
 	move(weapon) {
 		this.weapon = weapon;
+
+		// switch (weapon) {
+		// 	case "hand":
+		// 		this.shootingRange.tint = 0x0000FF;
+		// 		break;
+		// 	case "default":
+		// 		this.shootingRange.tint = 0xFFFFFF;
+		// 		break;
+		// }
 	}
 
 	down(weapon) {
@@ -252,6 +264,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.laser.visible = true;
 		this.laser.play({key: "RobotLaser"});
 		this.isLasering = true;
+		this.scene.cameras.main.shake(200, 0.01);
 	}
 
 	ungrab() {
