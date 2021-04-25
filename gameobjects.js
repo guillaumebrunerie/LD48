@@ -190,6 +190,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
 		let speed = rand(conf.bulletSpeed);
 		this.speedX = speed * Math.cos(angle);
 		this.speedY = speed * Math.sin(angle);
+		this.scale = 1.4;
 		this.play("RobotShot");
 	}
 
