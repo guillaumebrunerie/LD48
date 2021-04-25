@@ -100,17 +100,15 @@ class Robot extends Phaser.GameObjects.Container {
 		this.eyes = scene.add.sprite(0, conf.eyesY, "RobotEyes_000");
 		this.add(this.eyes);
 
-		this.beam = scene.add.sprite(0, 0, "player");
+		this.beam = scene.add.sprite(0, 0, "Robot_Line");
 		this.beam.setOrigin(0.5, 0);
-		this.beam.scaleX = 0.1;
-		this.beam.scaleY = 10;
+		this.beam.setAlpha(1);
 		this.beam.visible = false;
 		this.add(this.beam);
 
-		this.beam2 = scene.add.sprite(0, 0, "player");
+		this.beam2 = scene.add.sprite(0, 0, "Robot_Line");
 		this.beam2.setOrigin(0.5, 0);
-		this.beam2.scaleX = 0.1;
-		this.beam2.scaleY = 10;
+		this.beam.setAlpha(1);
 		this.beam2.visible = false;
 		this.add(this.beam2);
 
@@ -157,8 +155,11 @@ class Robot extends Phaser.GameObjects.Container {
 
 		if (this.charging) {
 			this.timeCharging += delta;
-			this.beam.rotation = Math.max(0, this.beamAngle - this.timeCharging / (1000 * this.beamSpeed));
+			let chargingLevel = Math.min(this.timeCharging / (1000 * this.beamSpeed * conf.beamAngle), 1);
+			this.beam.rotation = conf.beamAngle * (1 - chargingLevel);
 			this.beam2.rotation = -this.beam.rotation;
+			this.beam.setAlpha(chargingLevel);
+			this.beam2.setAlpha(chargingLevel);
 		}
 	}
 
@@ -193,8 +194,8 @@ class Robot extends Phaser.GameObjects.Container {
 
 class Bullet extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y, angle) {
-		super(scene, x, y, "player");
-		this.scale = 0.1;
+		super(scene, x, y, "Robot_Line");
+		this.setScale(2, 0.02);
 		this.speed = rand(conf.bulletSpeed);
 		this.angle = angle;
 	}
@@ -219,7 +220,7 @@ class Hand extends Phaser.GameObjects.Container {
 		this.add(hand);
 		this.hand.play("RobotHandStart");
 
-		let line = this.line = scene.add.sprite(0, 0, "Robot_Line").setOrigin(0.5, 1);
+		let line = this.line = scene.add.sprite(0, 0, "Robot_Line").setOrigin(0.5, 1).setScale(1.1);
 		this.add(line);
 
 		const shape = this.scene.make.graphics();
