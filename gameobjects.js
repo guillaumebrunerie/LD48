@@ -151,7 +151,7 @@ class Robot extends Phaser.GameObjects.Container {
 			this.chargingLevel += delta / (1000 * this.beamSpeed * conf.beamAngle);
 			if (this.chargingLevel > 1)
 				this.chargingLevel = 1;
-			this.shootingRange.setScale(4 * (1 - this.chargingLevel), 4);
+			this.shootingRange.setScale(Math.max(4 * (1 - this.chargingLevel), 0.05), 4);
 			this.shootingRange.setAlpha(this.chargingLevel / 2);
 		}
 	}
