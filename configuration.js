@@ -29,6 +29,7 @@ conf.eyesY = -8;
 // Shooting beam
 conf.beamAngle = 0.3;
 conf.beamSpeed = 2.5;
+conf.shootingRangeY = -100;
 
 // Bullets
 conf.bulletSpeed = 2;

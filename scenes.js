@@ -4,6 +4,8 @@ class MainScene extends Phaser.Scene {
 
 		this.lastFired = 0;
 		this.shieldLevel = 2;
+
+		window.scene = this;
 	}
 
 	loadPNGSequence(name, duration) {
@@ -38,13 +40,15 @@ class MainScene extends Phaser.Scene {
 		this.load.image("Bg", "Bg/Bg.jpg");
 
 		this.load.setPath("assets/Robot");
-		this.load.image(["Robot", "Robot_Hand", "Robot_Line"]);
+		this.load.image(["Robot", "Robot_Hand", "Robot_Line", "RobotShootingRange"]);
 		this.load.setPath("assets/Robot/RobotEyesFocus");
 		this.loadPNGSequence("RobotEyes", 24);
 		this.load.setPath("assets/Robot/RobotHandGrab");
 		this.loadPNGSequence("RobotHandGrab", 5);
 		this.load.setPath("assets/Robot/RobotHandStart");
 		this.loadPNGSequence("RobotHandStart", 8);
+		this.load.setPath("assets/Robot/RobotShot");
+		this.loadPNGSequence("RobotShot", 13);
 
 		this.load.setPath("assets");
 
@@ -88,6 +92,7 @@ class MainScene extends Phaser.Scene {
 		this.createPNGSequence("RobotEyes", 24, {frameRate: 30});
 		this.createPNGSequence("RobotHandGrab", 5);
 		this.createPNGSequence("RobotHandStart", 8);
+		this.createPNGSequence("RobotShot", 13, {repeat: -1});
 
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 10});
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});

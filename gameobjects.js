@@ -100,17 +100,11 @@ class Robot extends Phaser.GameObjects.Container {
 		this.eyes = scene.add.sprite(0, conf.eyesY, "RobotEyes_000");
 		this.add(this.eyes);
 
-		this.beam = scene.add.sprite(0, 0, "Robot_Line");
-		this.beam.setOrigin(0.5, 0);
-		this.beam.setAlpha(1);
-		this.beam.visible = false;
-		this.add(this.beam);
-
-		this.beam2 = scene.add.sprite(0, 0, "Robot_Line");
-		this.beam2.setOrigin(0.5, 0);
-		this.beam.setAlpha(1);
-		this.beam2.visible = false;
-		this.add(this.beam2);
+		this.shootingRange = scene.add.sprite(0, conf.shootingRangeY, "RobotShootingRange");
+		this.shootingRange.setOrigin(0.5, 0);
+		this.shootingRange.setAlpha(1);
+		this.shootingRange.visible = false;
+		this.add(this.shootingRange);
 
 		// Track where the robot is
 		this.centerY = conf.robotY - conf.robotRadius;
@@ -118,14 +112,14 @@ class Robot extends Phaser.GameObjects.Container {
 		this.angleMax = conf.angleMax;
 		this.speed = conf.robotSpeed;
 
-		// The beam
+		// The shootingRange
 		this.beamAngle = conf.beamAngle;
 		this.beamSpeed = conf.beamSpeed;
 
 		this.position = 0; // -1 to +1
 
 		this.charging = false;
-		this.timeCharging = 0;
+		this.chargingLevel = 0;
 	}
 
 	update(time, delta) {
@@ -154,29 +148,26 @@ class Robot extends Phaser.GameObjects.Container {
 		this.rotation = -angle;
 
 		if (this.charging) {
-			this.timeCharging += delta;
-			let chargingLevel = Math.min(this.timeCharging / (1000 * this.beamSpeed * conf.beamAngle), 1);
-			this.beam.rotation = conf.beamAngle * (1 - chargingLevel);
-			this.beam2.rotation = -this.beam.rotation;
-			this.beam.setAlpha(chargingLevel);
-			this.beam2.setAlpha(chargingLevel);
+			this.chargingLevel += delta / (1000 * this.beamSpeed * conf.beamAngle);
+			if (this.chargingLevel > 1)
+				this.chargingLevel = 1;
+			this.shootingRange.setScale(4 * (1 - this.chargingLevel), 4);
+			this.shootingRange.setAlpha(this.chargingLevel / 2);
 		}
 	}
 
 	down() {
-		this.beam.visible = true;
-		this.beam2.visible = true;
+		this.shootingRange.visible = true;
 		this.charging = true;
-		this.timeCharging = 0;
+		this.chargingLevel = 0;
 		this.eyes.play("RobotEyes");
 	}
 
 	up(weapon) {
-		this.beam.visible = false;
-		this.beam2.visible = false;
+		this.shootingRange.visible = false;
 		this.charging = false;
 
-		let firingAngle = this.rotation + Math.PI/2 + this.beam.rotation * rand({min: -1, max: 1});
+		let firingAngle = this.rotation + Math.PI/2 + (1 - this.chargingLevel) * rand({min: -conf.beamAngle, max: conf.beamAngle});
 
 		this.scene.fire(this.x, this.y, firingAngle, weapon);
 		this.eyes.stop();
@@ -194,20 +185,22 @@ class Robot extends Phaser.GameObjects.Container {
 
 class Bullet extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y, angle) {
-		super(scene, x, y, "Robot_Line");
-		this.setScale(2, 0.02);
-		this.speed = rand(conf.bulletSpeed);
-		this.angle = angle;
+		super(scene, x, y, "RobotShot");
+		this.rotation = angle - Math.PI/2;
+		let speed = rand(conf.bulletSpeed);
+		this.speedX = speed * Math.cos(angle);
+		this.speedY = speed * Math.sin(angle);
+		this.play("RobotShot");
 	}
 
 	update(time, delta) {
 		this.oldX = this.x;
 		this.oldY = this.y;
 
-		this.x += this.speed * delta * Math.cos(this.angle);
-		this.y += this.speed * delta * Math.sin(this.angle);
+		this.x += this.speedX * delta;
+		this.y += this.speedY * delta;
 
-		if (this.getTopCenter().y > this.scene.scale.height)
+		if (this.y > this.scene.scale.height)
 			this.destroy();
 	}
 }
