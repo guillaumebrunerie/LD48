@@ -116,6 +116,8 @@ class MainScene extends Phaser.Scene {
 
 		this.collectedScrews = 0;
 		this.lastTime = this.time.now;
+
+		this.pulledObject = null;
 	}
 
 	move(e) {
@@ -219,6 +221,7 @@ class MainScene extends Phaser.Scene {
 				if (inCircle(p.getBounds(), h.x, h.y)) {
 					h.pullback();
 					p.pullback(h);
+					this.pulledObject = p;
 				}
 			});
 		});
