@@ -85,6 +85,14 @@ class StartScene extends Phaser.Scene {
 		this.load.setPath("assets/UI/LevelComplete");
 		this.load.image("LevelCompleteBg");
 		[1, 2, 3, 4, 5].forEach(i => this.load.image("BoardLevelComplete" + i));
+
+		this.load.setPath("assets/Audio");
+		this.load.audio("fire", "Robot/DefaultShot.mp3");
+		this.load.audio("laser", "Robot/Laser.mp3");
+		this.load.audio("explosion", "Fx/Explosion 1.mp3");
+		this.load.audio("hit", "Robot/RobotPowerDown.mp3");
+		this.load.audio("shield", "PowerUps/PickUp.mp3");
+		this.load.audio("music", "Music/Stage3.mp3");
 	}
 
 	create() {
@@ -119,7 +127,10 @@ class StartScene extends Phaser.Scene {
 					rotation: 0,
 					duration: 100,
 					ease: "Quad",
-					onComplete: () => this.scene.start("MainScene", 1),
+					onComplete: () => {
+						this.sound.play("music", {loop: true});
+						this.scene.start("MainScene", 1);
+					},
 				});
 			}
 		});
@@ -252,16 +263,7 @@ class MainScene extends Phaser.Scene {
 
 		this.collectedScrews = 0;
 
-		// // Input
-		// let spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-
-		// spaceBar.on("down", () => this.down("default"));
-		// spaceBar.on("up",   () => this.up("default"));
-
-		// let tab = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.TAB);
-
-		// tab.on("down", () => this.down("hand"));
-		// tab.on("up",   () => this.up("hand"));
+		// Input
 
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
@@ -359,6 +361,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	loseLife() {
+		this.sound.play("hit");
 		if (this.shieldLevel == 0) {
 			this.gameOver();
 			return;
@@ -392,6 +395,7 @@ class MainScene extends Phaser.Scene {
 			default:
 				return;
 		}
+		this.sound.play("shield");
 		shield.visible = true;
 		shield.play("ShieldBubbleStart");
 		this.shieldLevel++;

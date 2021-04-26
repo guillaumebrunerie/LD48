@@ -77,6 +77,7 @@ class Obstacle extends DriftingThing {
 	explode() {
 		if (!this.isExploding) {
 			this.isExploding = true;
+			this.scene.sound.play("explosion");
 			this.play("ExplosionDefault");
 			this.on("animationcomplete", () => this.destroy());
 		}
@@ -293,6 +294,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		switch (weapon) {
 			case "default":
+				this.scene.sound.play("fire");
 				this.scene.bullets.add(new Bullet(this.scene, this.x, this.y, angle), true);
 				break;
 			case "hand":
@@ -308,6 +310,7 @@ class Robot extends Phaser.GameObjects.Container {
 		// let laser = this.add.sprite(0, conf.laserY, "RobotLaser")
 		// 		.setOrigin(0.5, 0);
 		// laserC.add(laser);
+		this.scene.sound.play("laser");
 		this.laser.visible = true;
 		this.laser.play("RobotLaser");
 		this.isLasering = true;
