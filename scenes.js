@@ -101,6 +101,7 @@ class StartScene extends Phaser.Scene {
 					scale: 1,
 					rotation: 0,
 					duration: 100,
+					ease: "Quad",
 					onComplete: () => this.scene.start("MainScene"),
 				});
 			}
@@ -111,9 +112,6 @@ class StartScene extends Phaser.Scene {
 class MainScene extends Phaser.Scene {
 	constructor() {
 		super("MainScene");
-
-		this.lastFired = 0;
-		this.shieldLevel = 2;
 
 		window.scene = this;
 	}
@@ -183,7 +181,7 @@ class MainScene extends Phaser.Scene {
 
 		// Astronaut
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
-		this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
+		this.astronaut = this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
 
 		this.shield = this.add.image(this.scale.width / 2, conf.astronautY, "Shield2");
 
@@ -239,6 +237,11 @@ class MainScene extends Phaser.Scene {
 		this.input.on("pointermove", (e) => this.move(e));
 
 		this.gameTime = 0;
+
+		this.lastFired = 0;
+		this.shieldLevel = 2;
+
+		this.cameras.main.fadeFrom(1000);
 	}
 
 	getWeaponFromEvent(e) {
@@ -301,6 +304,9 @@ class MainScene extends Phaser.Scene {
 		let y = conf.screwY;
 		this.screwContainer.add(this.add.image(x, y, "UI_Screw"));
 		this.collectedScrews++;
+
+		if (this.collectedScrews == 3)
+			this.win();
 	}
 
 	loseLife() {
@@ -344,8 +350,12 @@ class MainScene extends Phaser.Scene {
 		// delta = time - this.lastTime;
 		// this.lastTime = time;
 
-		this.bullets.getChildren().forEach(b => {
-			this.objects.getChildren().forEach(o => {
+		let bullets = this.bullets.getChildren().slice();
+		let objects = this.objects.getChildren().slice();
+		let hands  = this.hands.getChildren().slice();
+
+		bullets.forEach(b => {
+			objects.forEach(o => {
 				if (inCircle(o.getBounds(), b.getBounds().centerX, b.getBounds().centerY)) {
 					o.explode();
 					b.destroy();
@@ -353,16 +363,35 @@ class MainScene extends Phaser.Scene {
 			});
 		});
 
-		this.hands.getChildren().forEach(h => {
+		objects = this.objects.getChildren().slice();
+
+		hands.forEach(h => {
 			if (h.pullingBack)
 				return;
-			this.objects.getChildren().forEach(p => {
+			objects.forEach(p => {
 				if (inCircle(p.getBounds(), h.x, h.y)) {
 					h.pullback();
 					p.pullback(h);
 					this.pulledObject = p;
 				}
 			});
+		});
+
+		objects.forEach(o => {
+			if (o.isExploding || !o.isObstacle)
+				return;
+			let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height)/4);
+
+			let shieldCircle = new Phaser.Geom.Circle(this.shield.x, this.shield.y, this.shield.getBounds().width/2);
+			if (this.shieldLevel > 0 && Phaser.Geom.Intersects.CircleToCircle(circle, shieldCircle)) {
+				o.collect();
+				return;
+			}
+			let astronautCircle = new Phaser.Geom.Circle(this.astronaut.x, this.astronaut.y, (this.astronaut.getBounds().width + this.astronaut.getBounds().height)/4);
+			if (this.shieldLevel == 0 && Phaser.Geom.Intersects.CircleToCircle(circle, astronautCircle)) {
+				o.collect();
+				this.gameOver();
+			}
 		});
 
 		if (this.gameTime > this.nextObstacle) {
@@ -384,5 +413,15 @@ class MainScene extends Phaser.Scene {
 		}
 
 		this.robot.update(time, delta);
+	}
+
+	gameOver() {
+		this.cameras.main.fade(3000);
+		this.time.delayedCall(3000, () => this.scene.restart());
+	}
+
+	win() {
+		this.cameras.main.fade(3000, 255, 255, 255);
+		this.time.delayedCall(3000, () => this.scene.restart());
 	}
 }

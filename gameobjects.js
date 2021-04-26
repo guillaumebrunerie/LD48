@@ -21,11 +21,10 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.y += delta * this.speedY;
 		this.rotation += delta * this.speedR;
 
-		if (this.getBounds().bottom < 0) {
-			if (this.isPulledBack)
-				this.collect();
+		if (this.y < this.scene.robot.y && this.isPulledBack && !this.isObstacle)
+			this.collect();
+		if (this.y < 0)
 			this.destroy();
-		}
 	}
 
 	pullback(c) {
@@ -58,6 +57,7 @@ class Obstacle extends DriftingThing {
 
 	collect() {
 		this.scene.loseLife();
+		this.explode();
 	}
 
 	explode() {
@@ -75,6 +75,7 @@ class PowerUp extends DriftingThing {
 	}
 
 	collect() {
+		this.isExploding = true;
 		switch (this.type) {
 			case "Laser":
 				this.scene.robot.hasLaser = true;
@@ -88,6 +89,13 @@ class PowerUp extends DriftingThing {
 			case "Target":
 				break;
 		}
+		this.scene.tweens.add({
+			targets: this,
+			scale: 1.5,
+			alpha: 0,
+			duration: 200,
+		}).on("complete", () => this.destroy());
+		this.speedX = this.speedY = 0;
 	}
 
 	explode() {
@@ -110,6 +118,7 @@ class Screw extends DriftingThing {
 
 	collect() {
 		this.scene.collectScrew();
+		this.destroy();
 	}
 }
 

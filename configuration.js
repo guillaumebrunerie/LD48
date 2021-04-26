@@ -53,7 +53,7 @@ conf.handPullbackSpeed = 0.5;
 conf.fastHand = 5;
 
 // Obstacles
-conf.obstacleCreationRate = {min: 1, max: 3};
+conf.obstacleCreationRate = {min: 1, max: 2};
 
 conf.obstacles = [
 	{name: "Asteroid_01", scale: {min: 0.5, max: 1}},
@@ -65,7 +65,7 @@ conf.obstacles = [
 
 conf.obstacleDefault = {
 	speedX: {min: -0.1, max: 0.1},
-	speedY: {min: -0.05, max: -0.2},
+	speedY: {min: -0.1, max: -0.25},
 	speedR: {min: -0.001, max: 0.001},
 	scale: 1,
 };
@@ -90,7 +90,7 @@ conf.powerUpDefault = {
 };
 
 // Screws
-conf.screwCreationRate = {min: 10, max: 30};
+conf.screwCreationRate = {min: 10, max: 5};
 
 conf.screws = [
 	{name: "Screw", speedX: {min: -0.1, max: 0.1}, speedY: {min: -0.1, max: -0.4}, speedR: {min: -0.001, max: 0.001}, scale: 1}
