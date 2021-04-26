@@ -217,9 +217,9 @@ class MainScene extends Phaser.Scene {
 		this.bullets = this.add.group({runChildUpdate: true, maxSize: 3});
 		this.hands = this.add.group({runChildUpdate: true, maxSize: 1});
 
-		this.nextObstacle = this.time.now;
-		this.nextPowerUp = this.time.now + 5000;
-		this.nextScrew = this.time.now + 30000;
+		this.nextObstacle = 0;
+		this.nextPowerUp = 5000;
+		this.nextScrew = 30000;
 
 		this.collectedScrews = 0;
 
@@ -237,6 +237,8 @@ class MainScene extends Phaser.Scene {
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
 		this.input.on("pointermove", (e) => this.move(e));
+
+		this.gameTime = 0;
 	}
 
 	getWeaponFromEvent(e) {
@@ -255,7 +257,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	down(e) {
-		if (this.time.now < this.lastFired + conf.reloadDelay * 1000)
+		if (this.gameTime < this.lastFired + conf.reloadDelay * 1000)
 			return;
 
 		this.downPosition = {x: e.position.x, y: e.position.y};
@@ -273,7 +275,7 @@ class MainScene extends Phaser.Scene {
 		if (!this.robot.charging && !this.robot.isLasering)
 			return;
 
-		this.lastFired = this.time.now;
+		this.lastFired = this.gameTime;
 		let weapon = this.getWeaponFromEvent(e);
 		this.robot.up(weapon);
 		this.uiContainer.setAlpha(0);
@@ -337,6 +339,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	update(time, delta) {
+		this.gameTime += delta;
 		// // console.log(`delta: ${delta}, cdelta: ${time - this.lastTime}`);
 		// delta = time - this.lastTime;
 		// this.lastTime = time;
@@ -362,22 +365,22 @@ class MainScene extends Phaser.Scene {
 			});
 		});
 
-		if (time > this.nextObstacle) {
+		if (this.gameTime > this.nextObstacle) {
 			let obstacle = new Obstacle(this);
 			this.objects.add(obstacle, true);
-			this.nextObstacle = time + rand(conf.obstacleCreationRate) * 1000;
+			this.nextObstacle = this.gameTime + rand(conf.obstacleCreationRate) * 1000;
 		}
 
-		if (time > this.nextPowerUp) {
+		if (this.gameTime > this.nextPowerUp) {
 			let powerUp = new PowerUp(this);
 			this.objects.add(powerUp, true);
-			this.nextPowerUp = time + rand(conf.powerUpCreationRate) * 1000;
+			this.nextPowerUp = this.gameTime + rand(conf.powerUpCreationRate) * 1000;
 		}
 
-		if (time > this.nextScrew) {
+		if (this.gameTime > this.nextScrew) {
 			let screw = new Screw(this);
 			this.objects.add(screw, true);
-			this.nextScrew = time + rand(conf.screwCreationRate) * 1000;
+			this.nextScrew = this.gameTime + rand(conf.screwCreationRate) * 1000;
 		}
 
 		this.robot.update(time, delta);
