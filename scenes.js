@@ -162,7 +162,7 @@ class MainScene extends Phaser.Scene {
 	create() {
 		// Background
 		// this.add.image(0, 0, "Bg").setOrigin(0, 0).setDepth(-10);
-		let bg = this.add.image(0, 0, "BgLong")
+		let bg = this.add.image(0, -800 * this.level, "BgLong")
 			.setOrigin(0, 0)
 			.setScale(1080/196)
 			.setDepth(-10);
@@ -180,8 +180,8 @@ class MainScene extends Phaser.Scene {
 		// 	.setPosition(0, this.bg.getBounds().height);
 		// let bgStars = this.add.image(this.scale.width / 2, this.scale.height / 2, "BgStars");
 
-		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars", 2, null, 10000, {z: -8});
-		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars2", 2, null, 20000, {z: -9});
+		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars", 2, null, 20000, {z: -8});
+		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars2", 2, null, 30000, {z: -9});
 		// this.makeParallaxImage(200, 2000, "BgPlanet_01", 2, 2000, 15000, {scale: 0.1});
 		// this.makeParallaxImage(400, 1500, "BgPlanet_02", 2, 2000, 15000, {scale: 0.1});
 		// this.makeParallaxImage(600, 1000, "BgPlanet_03", 2, 2000, 15000, {scale: 0.1});
@@ -251,6 +251,7 @@ class MainScene extends Phaser.Scene {
 
 		this.input.on("pointerdown", (e) => this.down(e));
 		this.input.on("pointerup", (e) => this.up(e));
+		this.input.on("pointerupoutside", (e) => this.up(e));
 		this.input.on("pointermove", (e) => this.move(e));
 
 		this.gameTime = 0;
@@ -269,6 +270,8 @@ class MainScene extends Phaser.Scene {
 					this.shield2.play("ShieldBubbleStart");
 				});
 		});
+
+		this.isFinished = false;
 	}
 
 	getWeaponFromEvent(e) {
@@ -278,7 +281,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	move(e) {
-		if (!this.robot.charging)
+		if (!this.robot.charging || this.isFinished)
 			return;
 
 		this.robot.move(this.getWeaponFromEvent(e));
@@ -287,7 +290,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	down(e) {
-		if (this.gameTime < this.lastFired + conf.reloadDelay * 1000)
+		if (this.gameTime < this.lastFired + conf.reloadDelay * 1000 || this.isFinished)
 			return;
 
 		this.downPosition = {x: e.position.x, y: e.position.y};
@@ -302,7 +305,7 @@ class MainScene extends Phaser.Scene {
 	}
 
 	up(e) {
-		if (!this.robot.charging && !this.robot.isLasering)
+		if ((!this.robot.charging && !this.robot.isLasering) || this.isFinished)
 			return;
 
 		this.lastFired = this.gameTime;
@@ -385,6 +388,11 @@ class MainScene extends Phaser.Scene {
 		// delta = time - this.lastTime;
 		// this.lastTime = time;
 
+		this.robot.update(time, delta);
+
+		if (this.isFinished)
+			return;
+
 		let bullets = this.bullets.getChildren().slice();
 		let objects = this.objects.getChildren().slice();
 		let hands  = this.hands.getChildren().slice();
@@ -461,17 +469,17 @@ class MainScene extends Phaser.Scene {
 			this.objects.add(screw, true).setDepth(-2);
 			this.nextScrew = this.gameTime + rand(this.conf.screwCreationRate) * 1000;
 		}
-
-		this.robot.update(time, delta);
 	}
 
 	gameOver() {
+		this.isFinished = true;
 		window.navigator.vibrate(200);
 		this.cameras.main.fade(500);
 		this.time.delayedCall(500, () => this.scene.start("GameOver", this.level));
 	}
 
 	win() {
+		this.isFinished = true;
 		this.cameras.main.fade(3000, 255, 255, 255);
 		let next = this.level + 1;
 		this.time.delayedCall(3000, () => this.scene.start("MainScene", next));

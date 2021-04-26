@@ -171,7 +171,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		this.charging = false;
 		this.chargingLevel = 0;
-		// this.hasLaser = true;
+		this.hasLaser = false;
 	}
 
 	update(time, delta) {
@@ -250,7 +250,7 @@ class Robot extends Phaser.GameObjects.Container {
 	}
 
 	up(weapon) {
-		if (!this.isLasering)
+		if (!this.isLasering || weapon == "hand")
 			this.fire(weapon);
 		this.isLasering = false;
 		this.laser.visible = false;

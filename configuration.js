@@ -37,7 +37,7 @@ conf.headOriginY = 50;
 conf.beamAngle = 0.3;
 conf.beamSpeed = 3.5;
 conf.shootingRangeY = 0;
-conf.shootingRangeAdjustment = 2000;
+conf.shootingRangeAdjustment = 1500;
 
 // Bullets
 conf.bulletSpeed = 2;
