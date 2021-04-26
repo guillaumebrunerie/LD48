@@ -37,7 +37,7 @@ conf.headOriginY = 50;
 conf.beamAngle = 0.3;
 conf.beamSpeed = 3.5;
 conf.shootingRangeY = 0;
-conf.shootingRangeAdjustment = 2000;
+conf.shootingRangeAdjustment = 1500;
 
 // Bullets
 conf.bulletSpeed = 2;
@@ -79,15 +79,13 @@ conf.levels["default"] = {
 	powerUps: [
 		{name: "Laser"},
 		{name: "Magnet"},
-		{name: "Shield", speed: {min: 0.4, max: 0.6}},
-		{name: "Shield", speed: {min: 0.4, max: 0.6}},
-		{name: "Shield", speed: {min: 0.4, max: 0.6}},
+		{name: "Shield"},
 		{name: "Target"}
 	],
 
 	powerUpDefault: {
 		speedX: {min: -0.1, max: 0.1},
-		speedY: {min: -0.1, max: -0.4},
+		speedY: {min: -0.05, max: -0.2},
 		speedR: {min: -0.001, max: 0.001},
 		scale: 1,
 	},
