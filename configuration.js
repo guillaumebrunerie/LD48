@@ -52,50 +52,63 @@ conf.handSpeed = 1;
 conf.handPullbackSpeed = 0.9;
 conf.fastHand = 5;
 
-// Obstacles
-conf.obstacleCreationRate = {min: 1, max: 2};
+conf.levels = {};
 
-conf.obstacles = [
-	{name: "Asteroid_01", scale: {min: 0.5, max: 1}},
-	{name: "Asteroid_02", scale: {min: 0.8, max: 1.4}},
-	{name: "Asteroid_03", scale: {min: 0.8, max: 1.4}},
-	{name: "Small_Asteroid_01", scale: {min: 0.8, max: 1.4}},
-	{name: "Small_Asteroid_02", scale: {min: 0.8, max: 1.4}}
-];
+conf.levels["default"] = {
+	// Obstacles
+	obstacleCreationRate: {min: 1, max: 2},
 
-conf.obstacleDefault = {
-	speedX: {min: -0.1, max: 0.1},
-	speedY: {min: -0.1, max: -0.25},
-	speedR: {min: -0.001, max: 0.001},
-	scale: 1,
+	obstacles: [
+		{name: "Asteroid_01", scale: {min: 0.5, max: 1}},
+		{name: "Asteroid_02", scale: {min: 0.8, max: 1.4}},
+		{name: "Asteroid_03", scale: {min: 0.8, max: 1.4}},
+		{name: "Small_Asteroid_01", scale: {min: 0.8, max: 1.4}},
+		{name: "Small_Asteroid_02", scale: {min: 0.8, max: 1.4}}
+	],
+
+	obstacleDefault: {
+		speedX: {min: -0.1, max: 0.1},
+		speedY: {min: -0.1, max: -0.25},
+		speedR: {min: -0.001, max: 0.001},
+		scale: 1,
+	},
+
+	// Powerups
+	powerUpCreationRate: {min: 2, max: 5},
+
+	powerUps: [
+		{name: "Laser"},
+		{name: "Magnet"},
+		{name: "Shield", speed: {min: 0.4, max: 0.6}},
+		{name: "Shield", speed: {min: 0.4, max: 0.6}},
+		{name: "Shield", speed: {min: 0.4, max: 0.6}},
+		{name: "Target"}
+	],
+
+	powerUpDefault: {
+		speedX: {min: -0.1, max: 0.1},
+		speedY: {min: -0.1, max: -0.4},
+		speedR: {min: -0.001, max: 0.001},
+		scale: 1,
+	},
+
+	// Screws
+	screwCreationRate: {min: 10, max: 5},
+
+	screws: [
+		{name: "Screw", speedX: {min: -0.1, max: 0.1}, speedY: {min: -0.1, max: -0.4}, speedR: {min: -0.001, max: 0.001}, scale: 1}
+	],
 };
 
-// Powerups
-conf.powerUpCreationRate = {min: 2, max: 5};
+function dup(level) {
+	return JSON.parse(JSON.stringify(level));
+}
 
-conf.powerUps = [
-	{name: "Laser"},
-	{name: "Magnet"},
-	{name: "Shield", speed: {min: 0.4, max: 0.6}},
-	{name: "Shield", speed: {min: 0.4, max: 0.6}},
-	{name: "Shield", speed: {min: 0.4, max: 0.6}},
-	{name: "Target"}
-];
+conf.levels["screws"] = dup(conf.levels["default"]);
+conf.levels["screws"].screwCreationRate = {min: 1, max: 2};
 
-conf.powerUpDefault = {
-	speedX: {min: -0.1, max: 0.1},
-	speedY: {min: -0.1, max: -0.4},
-	speedR: {min: -0.001, max: 0.001},
-	scale: 1,
-};
-
-// Screws
-conf.screwCreationRate = {min: 10, max: 5};
-
-conf.screws = [
-	{name: "Screw", speedX: {min: -0.1, max: 0.1}, speedY: {min: -0.1, max: -0.4}, speedR: {min: -0.001, max: 0.001}, scale: 1}
-];
-
+conf.levels["powerUps"] = dup(conf.levels["default"]);
+conf.levels["powerUps"].powerUpCreationRate = {min: 1, max: 2};
 
 //// Apply the default values
 
@@ -108,5 +121,19 @@ function defaultize(array, def) {
 	});
 }
 
-defaultize(conf.obstacles, conf.obstacleDefault);
-defaultize(conf.powerUps, conf.powerUpDefault);
+conf.allObstacles = [];
+conf.allPowerUps = [];
+
+for (let key in conf.levels) {
+	let level = conf.levels[key];
+	defaultize(level.obstacles, level.obstacleDefault);
+	defaultize(level.powerUps, level.powerUpDefault);
+	level.obstacles.forEach(o => {
+		if (!conf.allObstacles.includes(o.name))
+			conf.allObstacles.push(o.name);
+	});
+	level.powerUps.forEach(o => {
+		if (!conf.allPowerUps.includes(o.name))
+			conf.allPowerUps.push(o.name);
+	});
+};
