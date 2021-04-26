@@ -510,15 +510,8 @@ class GameOver extends Phaser.Scene {
 
 		this.add.image(0, 0, "SignalLostBg").setOrigin(0, 0);
 
-		let images = [];
-		images.push(this.add.image(350, 300, "SignalLost_Astronaut"));
-		images.push(this.add.image(800, 1500, "SignalLost_Astronaut_Line"));
-		images.push(this.add.image(350, 850, "SignalLostTxt1"));
-		images.push(this.add.image(750, 700, "SignalLostTxt2"));
-
-		let drift = (image) => {
+		let drift = (image, speed) => {
 			let angle = Math.random() * 2 * Math.PI;
-			let speed = 70;
 			let dx = speed * Math.cos(angle);
 			let dy = speed * Math.sin(angle);
 			this.tweens.add({
@@ -526,9 +519,13 @@ class GameOver extends Phaser.Scene {
 				x: image.x + dx,
 				y: image.y + dy,
 				duration: 3000 + Math.random() * 2000,
-			}).on("complete", () => drift(image));
+			}).on("complete", () => drift(image, speed));
 		};
-		images.forEach(image => drift(image));
+
+		drift(this.add.image(350, 300, "SignalLost_Astronaut"), 100);
+		drift(this.add.image(800, 1500, "SignalLost_Astronaut_Line"), 100);
+		drift(this.add.image(750, 700, "SignalLostTxt2"), 20);
+		drift(this.add.image(350, 850, "SignalLostTxt1"), 20);
 
 		let button = this.add.image(540, 1370, "TryAgainButton");
 
