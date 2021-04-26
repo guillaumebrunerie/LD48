@@ -21,7 +21,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.y += delta * this.speedY;
 		this.rotation += delta * this.speedR;
 
-		if (this.y < this.scene.robot.y && this.isPulledBack && !this.isObstacle)
+		if (this.y < this.scene.robot.y && this.isPulledBack && !this.isObstacle && !this.isExploding)
 			this.collect();
 		if (this.y < 0)
 			this.destroy();
@@ -284,7 +284,7 @@ class Robot extends Phaser.GameObjects.Container {
 		// 		.setOrigin(0.5, 0);
 		// laserC.add(laser);
 		this.laser.visible = true;
-		this.laser.play({key: "RobotLaser"});
+		this.laser.play("RobotLaser");
 		this.isLasering = true;
 		this.scene.cameras.main.shake(200, 0.01);
 	}

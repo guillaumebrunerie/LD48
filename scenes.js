@@ -15,11 +15,16 @@ class StartScene extends Phaser.Scene {
 		this.load.setPath("assets");
 		this.load.image("Astronaut", "Astronaut/Astronaut.png");
 		this.load.image("Astronaut_Line", "Astronaut/Astronaut_Line.png");
-		this.load.image("Shield1", "Fx/ShieldBubble.png");
-		this.load.image("Shield2", "Fx/ShieldBubble.png");
+		this.load.image("ShieldBubble", "Fx/ShieldBubble.png");
 
 		this.load.setPath("assets/Fx/ExplosionDefault");
 		this.loadPNGSequence("ExplosionDefault", 6);
+
+		this.load.setPath("assets/Fx/ShieldBubbleStart");
+		this.loadPNGSequence("ShieldBubbleStart", 15);
+
+		this.load.setPath("assets/Fx/ShieldBubbleEnd");
+		this.loadPNGSequence("ShieldBubbleEnd", 3);
 
 		this.load.setPath("assets/Bg");
 		this.load.image([
@@ -183,7 +188,11 @@ class MainScene extends Phaser.Scene {
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
 		this.astronaut = this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
 
-		this.shield = this.add.image(this.scale.width / 2, conf.astronautY, "Shield2");
+		this.createPNGSequence("ShieldBubbleStart", 15);
+		this.createPNGSequence("ShieldBubbleEnd", 3);
+
+		this.shield1 = this.add.sprite(this.scale.width / 2, conf.astronautY, "ShieldBubble").setScale(1.5);
+		this.shield2 = this.add.sprite(this.scale.width / 2, conf.astronautY, "ShieldBubble").setScale(2);
 
 		// UI
 		this.uiContainer = this.add.container(0, 0)
@@ -310,34 +319,37 @@ class MainScene extends Phaser.Scene {
 	}
 
 	loseLife() {
+		let shield;
+		switch (this.shieldLevel) {
+			case 1:
+				shield = this.shield1;
+				break;
+			case 2:
+				shield = this.shield2;
+				break;
+			default:
+				return;
+		}
+		shield.play("ShieldBubbleEnd").once("animationcomplete", () => shield.visible = false);
 		this.shieldLevel--;
-		if (this.shieldLevel < 0)
-			this.shieldLevel = 0;
-		this.updateShield();
 		window.navigator.vibrate(100);
 	}
 
 	repairShield() {
-		this.shieldLevel++;
-		if (this.shieldLevel > 2)
-			this.shieldLevel = 2;
-		this.updateShield();
-	}
-
-	updateShield() {
+		let shield;
 		switch (this.shieldLevel) {
 			case 0:
-				this.shield.visible = false;
+				shield = this.shield1;
 				break;
 			case 1:
-				this.shield.visible = true;
-				this.shield.setTexture("Shield1");
+				shield = this.shield2;
 				break;
-			case 2:
-				this.shield.visible = true;
-				this.shield.setTexture("Shield2");
-				break;
+			default:
+				return;
 		}
+		shield.visible = true;
+		shield.play("ShieldBubbleStart");
+		this.shieldLevel++;
 	}
 
 	magnetize() {
@@ -388,7 +400,7 @@ class MainScene extends Phaser.Scene {
 				return;
 			let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height)/4);
 
-			let shieldCircle = new Phaser.Geom.Circle(this.shield.x, this.shield.y, this.shield.getBounds().width/2);
+			let shieldCircle = new Phaser.Geom.Circle(this.shield2.x, this.shield2.y, this.shield2.getBounds().width/2);
 			if (this.shieldLevel > 0 && Phaser.Geom.Intersects.CircleToCircle(circle, shieldCircle)) {
 				o.collect();
 				return;

@@ -75,9 +75,9 @@ conf.powerUpCreationRate = {min: 2, max: 5};
 
 conf.powerUps = [
 	{name: "Laser"},
-	{name: "Laser"},
-	{name: "Laser"},
 	{name: "Magnet"},
+	{name: "Shield", speed: {min: 0.4, max: 0.6}},
+	{name: "Shield", speed: {min: 0.4, max: 0.6}},
 	{name: "Shield", speed: {min: 0.4, max: 0.6}},
 	{name: "Target"}
 ];
