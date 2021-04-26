@@ -64,7 +64,8 @@ conf.levels["default"] = {
 		{name: "Asteroid_03", scale: {min: 0.8, max: 1.4}},
 		{name: "Small_Asteroid_01", scale: {min: 0.8, max: 1.4}},
 		{name: "Small_Asteroid_02", scale: {min: 0.8, max: 1.4}},
-		{name: "Tire", scale: {min: 0.8, max: 1.1}}
+		{name: "Tire", scale: {min: 0.8, max: 1.1}},
+		{name: "ObstacleTV", scale: {min: 0.5, max: 0.8}, anim: true},
 	],
 
 	obstacleDefault: {
@@ -134,7 +135,7 @@ for (let key in conf.levels) {
 	defaultize(level.obstacles, level.obstacleDefault);
 	defaultize(level.powerUps, level.powerUpDefault);
 	level.obstacles.forEach(o => {
-		if (!conf.allObstacles.includes(o.name))
+		if (!conf.allObstacles.includes(o.name) && !o.anim)
 			conf.allObstacles.push(o.name);
 	});
 	level.powerUps.forEach(o => {

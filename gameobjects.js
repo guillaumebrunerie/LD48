@@ -4,7 +4,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 	constructor(scene, data) {
 		super(scene, Math.random() * scene.scale.width, scene.scale.height, data.name);
 		this.rotation = Math.random() * Math.PI*2;
-		this.y = this.y + this.height / 2;
+		this.y = this.y + this.getBounds().height / 2;
 		this.type = data.name;
 		this.scale = rand(data.scale);
 		this.isPulledBack = false;
@@ -14,6 +14,8 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.speedR = rand(data.speedR);
 
 		this.isObstacle = false;
+		if (data.anim)
+			this.play(data.name);
 	}
 
 	update(time, delta) {
@@ -129,8 +131,20 @@ class Screw extends DriftingThing {
 	}
 
 	collect() {
-		this.scene.collectScrew();
-		this.destroy();
+		if (!this.isExploding) {
+			this.isExploding = true;
+			this.setScale(0.5);
+			this.scene.tweens.add({
+				targets: this,
+				x: this.scene.screwContainer.x,
+				y: this.scene.screwContainer.y,
+				alpha: 0.5,
+				duration: 300,
+			}).on("complete", () => {
+				this.scene.collectScrew();
+				this.destroy();
+			});
+		}
 	}
 }
 

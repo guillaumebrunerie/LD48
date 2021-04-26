@@ -49,6 +49,9 @@ class StartScene extends Phaser.Scene {
 		this.load.setPath("assets/Robot/RobotLaserEyes");
 		this.loadPNGSequence("RobotLaserEyes", 10);
 
+		this.load.setPath("assets/Obstacles/ObstacleTV");
+		this.loadPNGSequence("ObstacleTV", 10);
+
 		this.load.setPath("assets");
 
 		conf.allObstacles.forEach(o => {
@@ -73,6 +76,10 @@ class StartScene extends Phaser.Scene {
 		this.load.setPath("assets/UI");
 		this.load.image("StartScreen");
 		this.load.image("StartButton");
+
+		this.load.setPath("assets/UI/LevelComplete");
+		this.load.image("LevelCompleteBg");
+		[1, 2, 3, 4, 5].forEach(i => this.load.image("BoardLevelComplete" + i));
 	}
 
 	create() {
@@ -226,6 +233,7 @@ class MainScene extends Phaser.Scene {
 		this.pulledObject = null;
 
 		this.createPNGSequence("ExplosionDefault", 6);
+		this.createPNGSequence("ObstacleTV", 10, {repeat: -1});
 
 		// Objects and more
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 100});
@@ -267,11 +275,14 @@ class MainScene extends Phaser.Scene {
 			this.shield1.play("ShieldBubbleStart")
 				.once("animationcomplete", () => {
 					this.shield2.visible = true;
-					this.shield2.play("ShieldBubbleStart");
+					this.shield2.play("ShieldBubbleStart")
+						.once("animationcomplete", () => {
+							this.isFinished = false;
+						});
 				});
 		});
 
-		this.isFinished = false;
+		this.isFinished = true;
 	}
 
 	getWeaponFromEvent(e) {
@@ -480,9 +491,62 @@ class MainScene extends Phaser.Scene {
 
 	win() {
 		this.isFinished = true;
-		this.cameras.main.fade(3000, 255, 255, 255);
-		let next = this.level + 1;
-		this.time.delayedCall(3000, () => this.scene.start("MainScene", next));
+		this.cameras.main.fade(2000, 255, 255, 255);
+		this.time.delayedCall(2000, () => this.scene.start("LevelComplete", this.level));
+	}
+}
+
+class LevelComplete extends Phaser.Scene {
+	constructor() {
+		super("LevelComplete");
+	}
+
+	preload() {
+	}
+
+	init(level) {
+		this.level = level;
+	}
+
+	create() {
+		window.scene = this;
+
+		this.cameras.main.fadeFrom(200, 255, 255, 255);
+
+		this.add.image(0, 0, "LevelCompleteBg").setOrigin(0, 0);
+		let button = this.add.image(this.scale.width / 2, 950, "BoardLevelComplete" + this.level);
+
+		button.setInteractive();
+		button.on("pointerdown", () => {
+			this.tweens.add({
+				targets: button,
+				scale: 1.1,
+				rotation: -0.1,
+				duration: 100,
+			});
+			button.isDown = true;
+		});
+		button.on("pointerout", () => {
+			button.isDown = false;
+			this.tweens.add({
+				targets: button,
+				scale: 1,
+				rotation: 0,
+				duration: 100,
+			});
+		});
+		button.on("pointerup", () => {
+			if (button.isDown) {
+				this.tweens.add({
+					targets: button,
+					scale: 1,
+					rotation: 0,
+					duration: 100,
+					ease: "Quad",
+					onComplete: () => this.scene.start("MainScene", this.level + 1),
+				});
+			}
+		});
 	}
 }
 
@@ -514,7 +578,7 @@ class GameOver extends Phaser.Scene {
 	create() {
 		window.scene = this;
 
-		this.cameras.main.fadeFrom(1000);
+		this.cameras.main.fadeFrom(500);
 
 		this.add.image(0, 0, "SignalLostBg").setOrigin(0, 0);
 

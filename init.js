@@ -1,5 +1,5 @@
 new Phaser.Game({
-	title: "The title of our game!",
+	title: "Space Buddies",
 	url: "The URL of our game!",
 	type: Phaser.AUTO,
 	transparent: false,
@@ -12,5 +12,5 @@ new Phaser.Game({
 		width: 1080,
 		height: 1920,
 	},
-	scene: [StartScene, MainScene, GameOver],
+	scene: [StartScene, MainScene, GameOver, LevelComplete],
 });
