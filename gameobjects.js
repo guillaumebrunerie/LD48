@@ -89,6 +89,18 @@ class PowerUp extends DriftingThing {
 				break;
 		}
 	}
+
+	explode() {
+		if (!this.isExploding) {
+			this.isExploding = true;
+			this.scene.tweens.add({
+				targets: this,
+				scale: 0.8,
+				alpha: 0,
+				duration: 200,
+			}).on("complete", () => this.destroy());
+		}
+	}
 }
 
 class Screw extends DriftingThing {
@@ -196,7 +208,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 			let objects = this.scene.objects.getChildren().slice().filter(o => o.isObstacle);
 			objects.forEach(o => {
-				let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height) / 3);
+				let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height) / 4);
 				let result = Phaser.Geom.Intersects.LineToCircle(line, circle);
 				if (result) {
 					o.explode();
