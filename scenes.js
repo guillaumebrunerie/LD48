@@ -15,7 +15,7 @@ class StartScene extends Phaser.Scene {
 		this.load.setPath("assets");
 		this.load.image("Astronaut", "Astronaut/Astronaut.png");
 		this.load.image("Astronaut_Line", "Astronaut/Astronaut_Line.png");
-		this.load.image("Shield1", "Fx/ShieldBubble2.png");
+		this.load.image("Shield1", "Fx/ShieldBubble.png");
 		this.load.image("Shield2", "Fx/ShieldBubble.png");
 
 		this.load.setPath("assets/Fx/ExplosionDefault");
