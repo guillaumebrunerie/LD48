@@ -34,9 +34,9 @@ class StartScene extends Phaser.Scene {
 		this.load.setPath("assets/Robot/RobotEyesFocus");
 		this.loadPNGSequence("RobotEyes", 24);
 		this.load.setPath("assets/Robot/RobotHandGrab");
-		this.loadPNGSequence("RobotHandGrab", 5);
+		this.loadPNGSequence("RobotHandGrab", 4);
 		this.load.setPath("assets/Robot/RobotHandStart");
-		this.loadPNGSequence("RobotHandStart", 8);
+		this.loadPNGSequence("RobotHandStart", 5);
 		this.load.setPath("assets/Robot/RobotShot");
 		this.loadPNGSequence("RobotShot", 13);
 		this.load.setPath("assets/Robot/RobotLaser");
@@ -197,8 +197,8 @@ class MainScene extends Phaser.Scene {
 
 		// Robot
 		this.createPNGSequence("RobotEyes", 24, {frameRate: 15});
-		this.createPNGSequence("RobotHandGrab", 5);
-		this.createPNGSequence("RobotHandStart", 8);
+		this.createPNGSequence("RobotHandGrab", 4);
+		this.createPNGSequence("RobotHandStart", 5);
 		this.createPNGSequence("RobotShot", 13, {repeat: -1});
 		this.createPNGSequence("RobotLaserEyes", 10, {repeat: -1});
 		this.createPNGSequence("RobotLaser", 3);
