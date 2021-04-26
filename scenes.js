@@ -278,12 +278,13 @@ class MainScene extends Phaser.Scene {
 					this.shield2.visible = true;
 					this.shield2.play("ShieldBubbleStart")
 						.once("animationcomplete", () => {
-							this.isFinished = false;
+							this.isStarting = false;
 						});
 				});
 		});
 
-		this.isFinished = true;
+		this.isFinished = false;
+		this.isStarting = true;
 	}
 
 	getWeaponFromEvent(e) {
@@ -297,7 +298,8 @@ class MainScene extends Phaser.Scene {
 			return;
 
 		this.robot.move(this.getWeaponFromEvent(e));
-		this.robot.weaponContainer.rotation = (this.downPosition.x - e.position.x) / conf.shootingRangeAdjustment;
+		let adjustment = conf.shootingRangeAdjustment / (this.robot.hasLaser ? 2 : 1);
+		this.robot.weaponContainer.rotation = (this.downPosition.x - e.position.x) / adjustment;
 		this.updateUI(e);
 	}
 
@@ -370,7 +372,7 @@ class MainScene extends Phaser.Scene {
 		}
 		shield.play("ShieldBubbleEnd").once("animationcomplete", () => shield.visible = false);
 		this.shieldLevel--;
-		window.navigator.vibrate(50);
+		window.navigator.vibrate && window.navigator.vibrate(50);
 	}
 
 	repairShield() {
@@ -402,7 +404,7 @@ class MainScene extends Phaser.Scene {
 
 		this.robot.update(time, delta);
 
-		if (this.isFinished)
+		if (this.isStarting)
 			return;
 
 		let bullets = this.bullets.getChildren().slice();
@@ -485,7 +487,7 @@ class MainScene extends Phaser.Scene {
 
 	gameOver() {
 		this.isFinished = true;
-		window.navigator.vibrate(200);
+		window.navigator.vibrate && window.navigator.vibrate(200);
 		this.cameras.main.fade(500);
 		this.time.delayedCall(500, () => this.scene.start("GameOver", this.level));
 	}
