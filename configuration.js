@@ -49,7 +49,7 @@ conf.laserY = -65;
 
 // Hand
 conf.handSpeed = 1;
-conf.handPullbackSpeed = 0.5;
+conf.handPullbackSpeed = 0.9;
 conf.fastHand = 5;
 
 // Obstacles

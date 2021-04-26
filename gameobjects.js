@@ -321,7 +321,7 @@ class Hand extends Phaser.GameObjects.Container {
 	constructor (scene, x, y, angle) {
 		super(scene, x, y);
 
-		let hand = this.hand = scene.add.sprite(0, 0, "Robot_Hand").setOrigin(0.5, 0.1);
+		let hand = this.hand = scene.add.sprite(0, 0, "Robot_Hand").setOrigin(0.5, 0.2);
 		this.add(hand);
 		this.hand.play("RobotHandStart");
 
@@ -378,8 +378,8 @@ class Hand extends Phaser.GameObjects.Container {
 
 	pullback() {
 		this.pullingBack = true;
-		this.speedX = -this.speedX;
-		this.speedY = -this.speedY;
+		this.speedX = -this.speedX * conf.handPullbackSpeed / conf.handSpeed;
+		this.speedY = -this.speedY * conf.handPullbackSpeed / conf.handSpeed;
 		this.hand.play("RobotHandGrab");
 
 		this.fixedRotation = this.rotation;
