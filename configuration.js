@@ -110,6 +110,12 @@ conf.levels["screws"].screwCreationRate = {min: 1, max: 2};
 conf.levels["powerUps"] = dup(conf.levels["default"]);
 conf.levels["powerUps"].powerUpCreationRate = {min: 1, max: 2};
 
+conf.levelNames = {
+	1: "screws",
+	2: "powerUps",
+	3: "default"
+};
+
 //// Apply the default values
 
 function defaultize(array, def) {

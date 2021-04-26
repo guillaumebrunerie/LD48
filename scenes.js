@@ -107,7 +107,7 @@ class StartScene extends Phaser.Scene {
 					rotation: 0,
 					duration: 100,
 					ease: "Quad",
-					onComplete: () => this.scene.start("MainScene-screws"),
+					onComplete: () => this.scene.start("MainScene", 1),
 				});
 			}
 		});
@@ -115,12 +115,15 @@ class StartScene extends Phaser.Scene {
 }
 
 class MainScene extends Phaser.Scene {
-	constructor(level) {
-		super("MainScene-" + level);
+	constructor() {
+		super("MainScene");
 
-		this.level = level;
-		this.conf = conf.levels[level];
 		window.scene = this;
+	}
+
+	init(level) {
+		this.level = level;
+		this.conf = conf.levels[conf.levelNames[level]];
 	}
 
 	createPNGSequence(name, duration, props) {
@@ -231,7 +234,7 @@ class MainScene extends Phaser.Scene {
 
 		this.nextObstacle = 0;
 		this.nextPowerUp = 5000;
-		this.nextScrew = 30000;
+		this.nextScrew = 0;
 
 		this.collectedScrews = 0;
 
@@ -257,11 +260,15 @@ class MainScene extends Phaser.Scene {
 
 		this.cameras.main.fadeFrom(1000);
 		this.shield2.visible = false;
-		this.shield1.play("ShieldBubbleStart")
-			.once("animationcomplete", () => {
-				this.shield2.visible = true;
-				this.shield2.play("ShieldBubbleStart");
-			});
+		this.shield1.visible = false;
+		this.time.delayedCall(500, () => {
+			this.shield1.visible = true;
+			this.shield1.play("ShieldBubbleStart")
+				.once("animationcomplete", () => {
+					this.shield2.visible = true;
+					this.shield2.play("ShieldBubbleStart");
+				});
+		});
 	}
 
 	getWeaponFromEvent(e) {
@@ -330,8 +337,10 @@ class MainScene extends Phaser.Scene {
 	}
 
 	loseLife() {
-		if (this.shieldLevel == 0)
+		if (this.shieldLevel == 0) {
 			this.gameOver();
+			return;
+		}
 
 		let shield;
 		switch (this.shieldLevel) {
@@ -346,7 +355,7 @@ class MainScene extends Phaser.Scene {
 		}
 		shield.play("ShieldBubbleEnd").once("animationcomplete", () => shield.visible = false);
 		this.shieldLevel--;
-		window.navigator.vibrate(100);
+		window.navigator.vibrate(50);
 	}
 
 	repairShield() {
@@ -457,16 +466,102 @@ class MainScene extends Phaser.Scene {
 	}
 
 	gameOver() {
-		this.cameras.main.fade(3000);
-		this.time.delayedCall(3000, () => this.scene.restart());
+		window.navigator.vibrate(200);
+		this.cameras.main.fade(500);
+		this.time.delayedCall(500, () => this.scene.start("GameOver", this.level));
 	}
 
 	win() {
 		this.cameras.main.fade(3000, 255, 255, 255);
-		let next = "powerUps";
-		this.time.delayedCall(3000, () => this.scene.start("MainScene-" + next));
+		let next = this.level + 1;
+		this.time.delayedCall(3000, () => this.scene.start("MainScene", next));
 	}
 }
 
-// class GameOver extends Phaser.Scene {
-// }
+class GameOver extends Phaser.Scene {
+	constructor() {
+		super("GameOver");
+	}
+
+	preload() {
+		this.pieces = [
+			"SignalLostTxt1",
+			"SignalLost_Astronaut",
+			"SignalLostTxt2",
+			"SignalLost_Astronaut_Line",
+			"TryAgainButton",
+		];
+
+		this.load.setPath("assets/UI/SignalLost");
+		this.load.image("SignalLostBg");
+		this.load.image(this.pieces);
+
+		this.objects = [];
+	}
+
+	init(level) {
+		this.level = level;
+	}
+
+	create() {
+		window.scene = this;
+
+		this.cameras.main.fadeFrom(1000);
+
+		this.add.image(0, 0, "SignalLostBg").setOrigin(0, 0);
+
+		let images = [];
+		images.push(this.add.image(350, 300, "SignalLost_Astronaut"));
+		images.push(this.add.image(800, 1500, "SignalLost_Astronaut_Line"));
+		images.push(this.add.image(350, 850, "SignalLostTxt1"));
+		images.push(this.add.image(750, 700, "SignalLostTxt2"));
+
+		let drift = (image) => {
+			let angle = Math.random() * 2 * Math.PI;
+			let speed = 70;
+			let dx = speed * Math.cos(angle);
+			let dy = speed * Math.sin(angle);
+			this.tweens.add({
+				targets: image,
+				x: image.x + dx,
+				y: image.y + dy,
+				duration: 3000 + Math.random() * 2000,
+			}).on("complete", () => drift(image));
+		};
+		images.forEach(image => drift(image));
+
+		let button = this.add.image(540, 1370, "TryAgainButton");
+
+		button.setInteractive();
+		button.on("pointerdown", () => {
+			this.tweens.add({
+				targets: button,
+				scale: 1.1,
+				rotation: -0.1,
+				duration: 100,
+			});
+			button.isDown = true;
+		});
+		button.on("pointerout", () => {
+			button.isDown = false;
+			this.tweens.add({
+				targets: button,
+				scale: 1,
+				rotation: 0,
+				duration: 100,
+			});
+		});
+		button.on("pointerup", () => {
+			if (button.isDown) {
+				this.tweens.add({
+					targets: button,
+					scale: 1,
+					rotation: 0,
+					duration: 100,
+					ease: "Quad",
+					onComplete: () => this.scene.start("MainScene", this.level),
+				});
+			}
+		});
+	}
+}
