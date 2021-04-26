@@ -8,6 +8,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.type = conf.name;
 		this.scale = rand(conf.scale);
 		this.isPulledBack = false;
+		this.setDepth(-2);
 
 		this.speedX = rand(conf.speedX);
 		this.speedY = rand(conf.speedY);

@@ -356,7 +356,10 @@ class MainScene extends Phaser.Scene {
 
 		bullets.forEach(b => {
 			objects.forEach(o => {
-				if (inCircle(o.getBounds(), b.getBounds().centerX, b.getBounds().centerY)) {
+				let q = o.getLocalPoint(b.x, b.y);
+				let textures = this.scene.systems.textures;
+				let alpha = textures.getPixelAlpha(q.x, q.y, o.texture.key);
+				if (alpha != null && alpha > 0) {
 					o.explode();
 					b.destroy();
 				}
@@ -369,7 +372,10 @@ class MainScene extends Phaser.Scene {
 			if (h.pullingBack)
 				return;
 			objects.forEach(p => {
-				if (inCircle(p.getBounds(), h.x, h.y)) {
+				let q = p.getLocalPoint(h.x, h.y);
+				let textures = this.scene.systems.textures;
+				let alpha = textures.getPixelAlpha(q.x, q.y, p.texture.key);
+				if (alpha != null && alpha > 0) {
 					h.pullback();
 					p.pullback(h);
 					this.pulledObject = p;
