@@ -21,8 +21,12 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.y += delta * this.speedY;
 		this.rotation += delta * this.speedR;
 
-		if (this.y < this.scene.robot.y && this.isPulledBack && !this.isObstacle && !this.isExploding)
-			this.collect();
+		if (this.y < this.scene.robot.y && this.isPulledBack && !this.isExploding) {
+			if (this.isObstacle)
+				this.throw();
+			else
+				this.collect();
+		}
 		if (this.y < 0)
 			this.destroy();
 	}
@@ -52,6 +56,13 @@ class Obstacle extends DriftingThing {
 	constructor(scene) {
 		super(scene, pick(scene.conf.obstacles));
 		this.isObstacle = true;
+	}
+
+	throw() {
+		let speed = Math.sqrt(this.speedX * this.speedX + this.speedY * this.speedY);
+		let angle = Math.atan2(this.scene.astronaut.y - this.y, this.scene.astronaut.x - this.x);
+		this.speedX = speed * Math.cos(angle);
+		this.speedY = speed * Math.sin(angle);
 	}
 
 	magnetize() {}

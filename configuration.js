@@ -79,15 +79,13 @@ conf.levels["default"] = {
 	powerUps: [
 		{name: "Laser"},
 		{name: "Magnet"},
-		{name: "Shield", speed: {min: 0.4, max: 0.6}},
-		{name: "Shield", speed: {min: 0.4, max: 0.6}},
-		{name: "Shield", speed: {min: 0.4, max: 0.6}},
+		{name: "Shield"},
 		{name: "Target"}
 	],
 
 	powerUpDefault: {
 		speedX: {min: -0.1, max: 0.1},
-		speedY: {min: -0.1, max: -0.4},
+		speedY: {min: -0.05, max: -0.2},
 		speedR: {min: -0.001, max: 0.001},
 		scale: 1,
 	},
