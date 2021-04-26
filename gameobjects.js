@@ -8,7 +8,6 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.type = conf.name;
 		this.scale = rand(conf.scale);
 		this.isPulledBack = false;
-		this.setDepth(-2);
 
 		this.speedX = rand(conf.speedX);
 		this.speedY = rand(conf.speedY);
@@ -32,6 +31,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.isPulledBack = true;
 		this.speedX = c.speedX;
 		this.speedY = c.speedY;
+		this.speedR = 0;
 	}
 
 	magnetize() {
@@ -321,7 +321,7 @@ class Hand extends Phaser.GameObjects.Container {
 	constructor (scene, x, y, angle) {
 		super(scene, x, y);
 
-		let hand = this.hand = scene.add.sprite(0, 0, "Robot_Hand");
+		let hand = this.hand = scene.add.sprite(0, 0, "Robot_Hand").setOrigin(0.5, 0.1);
 		this.add(hand);
 		this.hand.play("RobotHandStart");
 
@@ -338,16 +338,18 @@ class Hand extends Phaser.GameObjects.Container {
 		this.speedX = conf.handSpeed * Math.cos(angle);
 		this.speedY = conf.handSpeed * Math.sin(angle);
 		this.rotation = this.scene.robot.rotation;
+
+		this.fixedRotation = 0;
 	}
 
 	update(time, delta) {
-		this.oldX = this.x;
-		this.oldY = this.y;
-
 		this.x += this.speedX * delta;
 		this.y += this.speedY * delta;
 
 		this.rotation = Math.atan2(this.y - this.scene.robot.y, this.x - this.scene.robot.x) - Math.PI/2;
+
+		if (this.pullingBack)
+			this.hand.rotation = this.fixedRotation - this.rotation;
 
 		let dx = this.x - this.scene.robot.x;
 		let dy = this.y - this.scene.robot.y;
@@ -379,6 +381,8 @@ class Hand extends Phaser.GameObjects.Container {
 		this.speedX = -this.speedX;
 		this.speedY = -this.speedY;
 		this.hand.play("RobotHandGrab");
+
+		this.fixedRotation = this.rotation;
 	}
 
 	pullbackFast() {

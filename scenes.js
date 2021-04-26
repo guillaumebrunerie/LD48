@@ -402,19 +402,19 @@ class MainScene extends Phaser.Scene {
 
 		if (this.gameTime > this.nextObstacle) {
 			let obstacle = new Obstacle(this);
-			this.objects.add(obstacle, true);
+			this.objects.add(obstacle, true).setDepth(-2);
 			this.nextObstacle = this.gameTime + rand(conf.obstacleCreationRate) * 1000;
 		}
 
 		if (this.gameTime > this.nextPowerUp) {
 			let powerUp = new PowerUp(this);
-			this.objects.add(powerUp, true);
+			this.objects.add(powerUp, true).setDepth(-2);
 			this.nextPowerUp = this.gameTime + rand(conf.powerUpCreationRate) * 1000;
 		}
 
 		if (this.gameTime > this.nextScrew) {
 			let screw = new Screw(this);
-			this.objects.add(screw, true);
+			this.objects.add(screw, true).setDepth(-2);
 			this.nextScrew = this.gameTime + rand(conf.screwCreationRate) * 1000;
 		}
 
