@@ -51,12 +51,12 @@ class StartScene extends Phaser.Scene {
 
 		this.load.setPath("assets");
 
-		conf.obstacles.forEach(o => {
-			this.load.image(o.name, `Obstacles/Obstacle_${o.name}.png`);
+		conf.allObstacles.forEach(o => {
+			this.load.image(o, `Obstacles/Obstacle_${o}.png`);
 		});
 
-		conf.powerUps.forEach(pu => {
-			this.load.image(pu.name, `PowerUps/PowerUp_${pu.name}.png`);
+		conf.allPowerUps.forEach(pu => {
+			this.load.image(pu, `PowerUps/PowerUp_${pu}.png`);
 		});
 
 		this.load.image("ScrewInventory","UI/UI_ScrewInventory.png");
@@ -107,7 +107,7 @@ class StartScene extends Phaser.Scene {
 					rotation: 0,
 					duration: 100,
 					ease: "Quad",
-					onComplete: () => this.scene.start("MainScene"),
+					onComplete: () => this.scene.start("MainScene-screws"),
 				});
 			}
 		});
@@ -115,9 +115,11 @@ class StartScene extends Phaser.Scene {
 }
 
 class MainScene extends Phaser.Scene {
-	constructor() {
-		super("MainScene");
+	constructor(level) {
+		super("MainScene-" + level);
 
+		this.level = level;
+		this.conf = conf.levels[level];
 		window.scene = this;
 	}
 
@@ -138,7 +140,10 @@ class MainScene extends Phaser.Scene {
 	makeParallaxImage(x, y, key, repeat, dy, duration, props) {
 		for (let i = -1; i < repeat; i++) {
 			let image = this.add.image(x, y, key);
-			if (props && props.scale) image.setScale(props.scale);
+			if (props && props.scale)
+				image.setScale(props.scale);
+			if (props && props.z)
+				image.setDepth(props.z);
 			if (dy === null)
 				dy = image.height;
 			image.y = y + dy * i;
@@ -172,8 +177,8 @@ class MainScene extends Phaser.Scene {
 		// 	.setPosition(0, this.bg.getBounds().height);
 		// let bgStars = this.add.image(this.scale.width / 2, this.scale.height / 2, "BgStars");
 
-		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars", 2, null, 10000);
-		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars2", 2, null, 20000);
+		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars", 2, null, 10000, {z: -8});
+		this.makeParallaxImage(this.scale.width / 2, this.scale.height / 2, "BgStars2", 2, null, 20000, {z: -9});
 		// this.makeParallaxImage(200, 2000, "BgPlanet_01", 2, 2000, 15000, {scale: 0.1});
 		// this.makeParallaxImage(400, 1500, "BgPlanet_02", 2, 2000, 15000, {scale: 0.1});
 		// this.makeParallaxImage(600, 1000, "BgPlanet_03", 2, 2000, 15000, {scale: 0.1});
@@ -251,6 +256,12 @@ class MainScene extends Phaser.Scene {
 		this.shieldLevel = 2;
 
 		this.cameras.main.fadeFrom(1000);
+		this.shield2.visible = false;
+		this.shield1.play("ShieldBubbleStart")
+			.once("animationcomplete", () => {
+				this.shield2.visible = true;
+				this.shield2.play("ShieldBubbleStart");
+			});
 	}
 
 	getWeaponFromEvent(e) {
@@ -427,19 +438,19 @@ class MainScene extends Phaser.Scene {
 		if (this.gameTime > this.nextObstacle) {
 			let obstacle = new Obstacle(this);
 			this.objects.add(obstacle, true).setDepth(-2);
-			this.nextObstacle = this.gameTime + rand(conf.obstacleCreationRate) * 1000;
+			this.nextObstacle = this.gameTime + rand(this.conf.obstacleCreationRate) * 1000;
 		}
 
 		if (this.gameTime > this.nextPowerUp) {
 			let powerUp = new PowerUp(this);
 			this.objects.add(powerUp, true).setDepth(-2);
-			this.nextPowerUp = this.gameTime + rand(conf.powerUpCreationRate) * 1000;
+			this.nextPowerUp = this.gameTime + rand(this.conf.powerUpCreationRate) * 1000;
 		}
 
 		if (this.gameTime > this.nextScrew) {
 			let screw = new Screw(this);
 			this.objects.add(screw, true).setDepth(-2);
-			this.nextScrew = this.gameTime + rand(conf.screwCreationRate) * 1000;
+			this.nextScrew = this.gameTime + rand(this.conf.screwCreationRate) * 1000;
 		}
 
 		this.robot.update(time, delta);
@@ -452,6 +463,10 @@ class MainScene extends Phaser.Scene {
 
 	win() {
 		this.cameras.main.fade(3000, 255, 255, 255);
-		this.time.delayedCall(3000, () => this.scene.restart());
+		let next = "powerUps";
+		this.time.delayedCall(3000, () => this.scene.start("MainScene-" + next));
 	}
 }
+
+// class GameOver extends Phaser.Scene {
+// }

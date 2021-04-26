@@ -1,17 +1,17 @@
 // Driftings things consist of obstacles and collectables
 
 class DriftingThing extends Phaser.GameObjects.Sprite {
-	constructor(scene, conf) {
-		super(scene, Math.random() * scene.scale.width, scene.scale.height, conf.name);
+	constructor(scene, data) {
+		super(scene, Math.random() * scene.scale.width, scene.scale.height, data.name);
 		this.rotation = Math.random() * Math.PI*2;
 		this.y = this.y + this.height / 2;
-		this.type = conf.name;
-		this.scale = rand(conf.scale);
+		this.type = data.name;
+		this.scale = rand(data.scale);
 		this.isPulledBack = false;
 
-		this.speedX = rand(conf.speedX);
-		this.speedY = rand(conf.speedY);
-		this.speedR = rand(conf.speedR);
+		this.speedX = rand(data.speedX);
+		this.speedY = rand(data.speedY);
+		this.speedR = rand(data.speedR);
 
 		this.isObstacle = false;
 	}
@@ -50,7 +50,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 
 class Obstacle extends DriftingThing {
 	constructor(scene) {
-		super(scene, pick(conf.obstacles));
+		super(scene, pick(scene.conf.obstacles));
 		this.isObstacle = true;
 	}
 
@@ -72,7 +72,7 @@ class Obstacle extends DriftingThing {
 
 class PowerUp extends DriftingThing {
 	constructor(scene) {
-		super(scene, pick(conf.powerUps));
+		super(scene, pick(scene.conf.powerUps));
 	}
 
 	collect() {
@@ -114,7 +114,7 @@ class PowerUp extends DriftingThing {
 
 class Screw extends DriftingThing {
 	constructor(scene) {
-		super(scene, pick(conf.screws));
+		super(scene, pick(scene.conf.screws));
 	}
 
 	collect() {
