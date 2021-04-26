@@ -298,6 +298,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.laser.play("RobotLaser");
 		this.isLasering = true;
 		this.scene.cameras.main.shake(200, 0.01);
+		this.hasLaser = false;
 	}
 
 	ungrab() {
