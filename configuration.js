@@ -96,7 +96,7 @@ conf.levels["default"] = {
 	screwCreationRate: {min: 10, max: 5},
 
 	screws: [
-		{name: "Screw", speedX: {min: -0.05, max: 0.05}, speedY: {min: -0.05, max: -0.2}, speedR: {min: -0.001, max: 0.001}, scale: 1}
+		{name: "Screw", speedX: {min: -0.05, max: 0.05}, speedY: {min: -0.05, max: -0.2}, speedR: {min: -0.001, max: 0.001}, scale: 1, anim: true}
 	],
 };
 

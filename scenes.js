@@ -66,6 +66,10 @@ class StartScene extends Phaser.Scene {
 		this.load.image("UI_Screw","UI/UI_Screw.png");
 		this.load.image("Screw","Collectables/Screw.png");
 
+		this.load.setPath("assets/Collectables/Screw");
+		this.loadPNGSequence("Screw", 30);
+
+		this.load.setPath("assets");
 		this.load.image("UI_Controls", "UI/UI_ControlsSocket.png");
 		this.load.image("UI_Hand", "UI/UI_ControlsButton_Hand.png");
 		this.load.image("UI_Shoot", "UI/UI_ControlsButton_Shoot.png");
@@ -235,6 +239,7 @@ class MainScene extends Phaser.Scene {
 
 		this.createPNGSequence("ExplosionDefault", 6);
 		this.createPNGSequence("ObstacleTV", 10, {repeat: -1});
+		this.createPNGSequence("Screw", 30, {frameRate: 15, repeat: -1});
 
 		// Objects and more
 		this.objects = this.add.group({runChildUpdate: true, maxSize: 100});
@@ -502,9 +507,6 @@ class MainScene extends Phaser.Scene {
 class LevelComplete extends Phaser.Scene {
 	constructor() {
 		super("LevelComplete");
-	}
-
-	preload() {
 	}
 
 	init(level) {
