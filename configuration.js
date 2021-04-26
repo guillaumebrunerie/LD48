@@ -63,7 +63,8 @@ conf.levels["default"] = {
 		{name: "Asteroid_02", scale: {min: 0.8, max: 1.4}},
 		{name: "Asteroid_03", scale: {min: 0.8, max: 1.4}},
 		{name: "Small_Asteroid_01", scale: {min: 0.8, max: 1.4}},
-		{name: "Small_Asteroid_02", scale: {min: 0.8, max: 1.4}}
+		{name: "Small_Asteroid_02", scale: {min: 0.8, max: 1.4}},
+		{name: "Tire", scale: {min: 0.8, max: 1.1}}
 	],
 
 	obstacleDefault: {
@@ -84,7 +85,7 @@ conf.levels["default"] = {
 	],
 
 	powerUpDefault: {
-		speedX: {min: -0.1, max: 0.1},
+		speedX: {min: -0.05, max: 0.05},
 		speedY: {min: -0.05, max: -0.2},
 		speedR: {min: -0.001, max: 0.001},
 		scale: 1,
@@ -94,7 +95,7 @@ conf.levels["default"] = {
 	screwCreationRate: {min: 10, max: 5},
 
 	screws: [
-		{name: "Screw", speedX: {min: -0.1, max: 0.1}, speedY: {min: -0.1, max: -0.4}, speedR: {min: -0.001, max: 0.001}, scale: 1}
+		{name: "Screw", speedX: {min: -0.05, max: 0.05}, speedY: {min: -0.05, max: -0.2}, speedR: {min: -0.001, max: 0.001}, scale: 1}
 	],
 };
 
