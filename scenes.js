@@ -319,6 +319,9 @@ class MainScene extends Phaser.Scene {
 	}
 
 	loseLife() {
+		if (this.shieldLevel == 0)
+			this.gameOver();
+
 		let shield;
 		switch (this.shieldLevel) {
 			case 1:
@@ -368,6 +371,7 @@ class MainScene extends Phaser.Scene {
 
 		bullets.forEach(b => {
 			objects.forEach(o => {
+				if (!b.scene || !o.scene) return;
 				let q = o.getLocalPoint(b.x, b.y);
 				let textures = this.scene.systems.textures;
 				let alpha = textures.getPixelAlpha(q.x, q.y, o.texture.key);
@@ -384,6 +388,7 @@ class MainScene extends Phaser.Scene {
 			if (h.pullingBack)
 				return;
 			objects.forEach(p => {
+				if (!h.scene || !p.scene) return;
 				let q = p.getLocalPoint(h.x, h.y);
 				let textures = this.scene.systems.textures;
 				let alpha = textures.getPixelAlpha(q.x, q.y, p.texture.key);
@@ -396,19 +401,26 @@ class MainScene extends Phaser.Scene {
 		});
 
 		objects.forEach(o => {
-			if (o.isExploding || !o.isObstacle)
+			if (o.isExploding || !o.isObstacle || !o.scene)
 				return;
 			let circle = new Phaser.Geom.Circle(o.x, o.y, (o.getBounds().width + o.getBounds().height)/4);
 
-			let shieldCircle = new Phaser.Geom.Circle(this.shield2.x, this.shield2.y, this.shield2.getBounds().width/2);
-			if (this.shieldLevel > 0 && Phaser.Geom.Intersects.CircleToCircle(circle, shieldCircle)) {
-				o.collect();
-				return;
+			let shieldSize;
+			switch (this.shieldLevel) {
+				case 0:
+					shieldSize = (this.astronaut.getBounds().width + this.astronaut.getBounds().height) / 4;
+					break;
+				case 1:
+					shieldSize = 250 * 1.5 / 2;
+					break;
+				case 2:
+					shieldSize = 250 * 2 / 2;
+					break;
 			}
-			let astronautCircle = new Phaser.Geom.Circle(this.astronaut.x, this.astronaut.y, (this.astronaut.getBounds().width + this.astronaut.getBounds().height)/4);
-			if (this.shieldLevel == 0 && Phaser.Geom.Intersects.CircleToCircle(circle, astronautCircle)) {
+
+			let shieldCircle = new Phaser.Geom.Circle(this.astronaut.x, this.astronaut.y, shieldSize);
+			if (Phaser.Geom.Intersects.CircleToCircle(circle, shieldCircle)) {
 				o.collect();
-				this.gameOver();
 			}
 		});
 
