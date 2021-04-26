@@ -76,6 +76,7 @@ class StartScene extends Phaser.Scene {
 		this.load.setPath("assets/UI");
 		this.load.image("StartScreen");
 		this.load.image("StartButton");
+		this.load.image("NextButton");
 
 		this.load.setPath("assets/UI/LevelComplete");
 		this.load.image("LevelCompleteBg");
@@ -514,7 +515,16 @@ class LevelComplete extends Phaser.Scene {
 		this.cameras.main.fadeFrom(200, 255, 255, 255);
 
 		this.add.image(0, 0, "LevelCompleteBg").setOrigin(0, 0);
-		let button = this.add.image(this.scale.width / 2, 950, "BoardLevelComplete" + this.level);
+		let lvlcomplete = this.add.image(this.scale.width / 2, 750, "BoardLevelComplete" + this.level);
+		this.tweens.add({
+			targets: lvlcomplete,
+			scale: 1.05,
+			yoyo: true,
+			repeat: -1,
+			duration: 1000,
+		});
+
+		let button = this.add.image(this.scale.width / 2, 1600, "NextButton");
 
 		button.setInteractive();
 		button.on("pointerdown", () => {
