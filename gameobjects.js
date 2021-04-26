@@ -161,7 +161,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		this.charging = false;
 		this.chargingLevel = 0;
-		this.hasLaser = true;
+		// this.hasLaser = true;
 	}
 
 	update(time, delta) {
