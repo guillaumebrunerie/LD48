@@ -22,7 +22,8 @@ class StartScene extends Phaser.Scene {
 			"TryAgainButton",
 		]);
 
-		this.load.image("GameComplete", "assets/UI/WinScreen.jpg");
+		this.load.setPath("assets/UI");
+		this.load.image("GameComplete", "WinScreen.jpg");
 
 		this.load.setPath("assets");
 		this.load.image("Astronaut", "Astronaut/Astronaut.png");
@@ -515,7 +516,7 @@ class MainScene extends Phaser.Scene {
 		this.isFinished = true;
 		this.cameras.main.fade(2000, 255, 255, 255);
 		this.time.delayedCall(2000, () => {
-			if (this.level == 2)
+			if (this.level == 3)
 				this.scene.start("GameComplete");
 			else
 				this.scene.start("LevelComplete", this.level);
