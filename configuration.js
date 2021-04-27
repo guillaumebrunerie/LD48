@@ -89,7 +89,7 @@ conf.levels["asteroids"] = {
 	powerUpDefault: conf.powerUpDefault,
 
 	// Screws
-	screwCreationRate: {min: 3, max: 5},
+	screwCreationRate: {min: 10, max: 15},
 	screws: [screw],
 };
 
@@ -102,7 +102,7 @@ conf.levels["varied"] = {
 	powerUps: [{name: "Shield"}, {name: "Laser"}, {name: "Magnet"}],
 	powerUpDefault: conf.powerUpDefault,
 
-	screwCreationRate: {min: 10, max: 15},
+	screwCreationRate: {min: 20, max: 30},
 	screws: [screw],
 };
 
@@ -115,7 +115,7 @@ conf.levels["small"] = {
 	powerUps: [{name: "Shield"}, {name: "Laser"}, {name: "Laser"}, {name: "Magnet"}],
 	powerUpDefault: conf.powerUpDefault,
 
-	screwCreationRate: {min: 20, max: 30},
+	screwCreationRate: {min: 30, max: 45},
 	screws: [screw],
 };
 

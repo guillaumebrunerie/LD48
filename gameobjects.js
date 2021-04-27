@@ -116,6 +116,7 @@ class PowerUp extends DriftingThing {
 	explode() {
 		if (!this.isExploding) {
 			this.isExploding = true;
+			this.scene.sound.play("explosion");
 			this.scene.tweens.add({
 				targets: this,
 				scale: 0.8,
@@ -130,6 +131,12 @@ class Screw extends DriftingThing {
 	constructor(scene) {
 		super(scene, pick(scene.conf.screws));
 	}
+
+	explode() {
+		this.scene.sound.play("explosion");
+		this.destroy();
+	}
+
 
 	collect() {
 		if (!this.isExploding) {

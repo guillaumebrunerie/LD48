@@ -9,5 +9,5 @@ new Phaser.Game({
 		width: 1080,
 		height: 1920,
 	},
-	scene: [StartScene, MainScene, GameOver, LevelComplete, HUD],
+	scene: [StartScene, MainScene, GameOver, LevelComplete, GameComplete, HUD],
 });

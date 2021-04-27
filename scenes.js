@@ -22,6 +22,8 @@ class StartScene extends Phaser.Scene {
 			"TryAgainButton",
 		]);
 
+		this.load.image("GameComplete", "assets/UI/WinScreen.jpg");
+
 		this.load.setPath("assets");
 		this.load.image("Astronaut", "Astronaut/Astronaut.png");
 		this.load.image("Astronaut_Line", "Astronaut/Astronaut_Line.png");
@@ -512,7 +514,12 @@ class MainScene extends Phaser.Scene {
 	win() {
 		this.isFinished = true;
 		this.cameras.main.fade(2000, 255, 255, 255);
-		this.time.delayedCall(2000, () => this.scene.start("LevelComplete", this.level));
+		this.time.delayedCall(2000, () => {
+			if (this.level == 2)
+				this.scene.start("GameComplete");
+			else
+				this.scene.start("LevelComplete", this.level);
+		});
 	}
 }
 
@@ -573,6 +580,18 @@ class LevelComplete extends Phaser.Scene {
 				});
 			}
 		});
+	}
+}
+
+class GameComplete extends Phaser.Scene {
+	constructor() {
+		super("GameComplete");
+	}
+
+	create() {
+		this.cameras.main.fadeFrom(200, 255, 255, 255);
+
+		this.add.image(0, 0, "GameComplete").setOrigin(0, 0);
 	}
 }
 
