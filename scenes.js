@@ -424,7 +424,7 @@ class MainScene extends Phaser.Scene {
 
 		this.robot.update(time, delta);
 
-		if (this.isStarting)
+		if (this.isStarting || this.isFinished)
 			return;
 
 		let bullets = this.bullets.getChildren().slice();
