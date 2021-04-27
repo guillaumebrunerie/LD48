@@ -231,7 +231,7 @@ class MainScene extends Phaser.Scene {
 		this.createPNGSequence("ShieldBubbleEnd", 3);
 
 		this.shield1 = this.add.sprite(this.scale.width / 2, conf.astronautY, "ShieldBubble").setScale(1.5);
-		this.shield2 = this.add.sprite(this.scale.width / 2, conf.astronautY, "ShieldBubble").setScale(2);
+		this.shield2 = this.add.sprite(this.scale.width / 2, conf.astronautY, "ShieldBubble").setScale(2).setAlpha(0.5);
 
 		// UI
 		this.uiContainer = this.add.container(0, 0)
