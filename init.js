@@ -2,7 +2,7 @@ new Phaser.Game({
 	title: "Space Buddies",
 	url: "The URL of our game!",
 	type: Phaser.AUTO,
-	transparent: false,
+	transparent: true,
 	fps: {
 		smoothstep: false,
 	},
@@ -12,5 +12,5 @@ new Phaser.Game({
 		width: 1080,
 		height: 1920,
 	},
-	scene: [StartScene, MainScene, GameOver, LevelComplete],
+	scene: [StartScene, MainScene, GameOver, LevelComplete, HUD],
 });

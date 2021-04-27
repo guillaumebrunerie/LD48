@@ -128,7 +128,6 @@ class StartScene extends Phaser.Scene {
 					duration: 100,
 					ease: "Quad",
 					onComplete: () => {
-						this.sound.play("music", {loop: true});
 						this.scene.start("MainScene", 1);
 					},
 				});
@@ -650,5 +649,33 @@ class GameOver extends Phaser.Scene {
 				});
 			}
 		});
+	}
+}
+
+class HUD extends Phaser.Scene {
+	constructor() {
+		super({key: "HUD", active: true});
+		this.musicStarted = false;
+	}
+
+	preload() {
+		this.load.setPath("assets/UI");
+		this.load.image(["Button_Music_ON", "Button_Music_OFF"]);
+	}
+
+	create() {
+		let button = this.add.image(980, 100, "Button_Music_OFF");
+
+		button.setInteractive();
+		button.on("pointerdown", () => {
+			button.setTexture("Button_Music_" + (this.sound.mute ? "ON" : "OFF"));
+			this.sound.mute = !this.sound.mute;
+			if (!this.musicStarted) {
+				this.sound.play("music", {loop: true});
+				this.musicStarted = true;
+			}
+		});
+
+		this.sound.mute = true;
 	}
 }
