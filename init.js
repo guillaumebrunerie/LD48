@@ -3,9 +3,6 @@ new Phaser.Game({
 	url: "The URL of our game!",
 	type: Phaser.AUTO,
 	transparent: true,
-	fps: {
-		smoothstep: false,
-	},
 	scale: {
 		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
 		mode: Phaser.Scale.FIT,

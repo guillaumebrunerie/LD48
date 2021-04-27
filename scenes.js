@@ -12,6 +12,16 @@ class StartScene extends Phaser.Scene {
 	}
 
 	preload() {
+		this.load.setPath("assets/UI/SignalLost");
+		this.load.image("SignalLostBg");
+		this.load.image([
+			"SignalLostTxt1",
+			"SignalLost_Astronaut",
+			"SignalLostTxt2",
+			"SignalLost_Astronaut_Line",
+			"TryAgainButton",
+		]);
+
 		this.load.setPath("assets");
 		this.load.image("Astronaut", "Astronaut/Astronaut.png");
 		this.load.image("Astronaut_Line", "Astronaut/Astronaut_Line.png");
@@ -92,7 +102,6 @@ class StartScene extends Phaser.Scene {
 		this.load.audio("explosion", "Fx/Explosion 1.mp3");
 		this.load.audio("hit", "Robot/RobotPowerDown.mp3");
 		this.load.audio("shield", "PowerUps/PickUp.mp3");
-		this.load.audio("music", "Music/Stage3.mp3");
 	}
 
 	create() {
@@ -480,7 +489,7 @@ class MainScene extends Phaser.Scene {
 			this.nextObstacle = this.gameTime + rand(this.conf.obstacleCreationRate) * 1000;
 		}
 
-		if (this.gameTime > this.nextPowerUp) {
+		if (this.gameTime > this.nextPowerUp && this.conf.powerUps.length > 0) {
 			let powerUp = new PowerUp(this);
 			this.objects.add(powerUp, true).setDepth(-2);
 			this.nextPowerUp = this.gameTime + rand(this.conf.powerUpCreationRate) * 1000;
@@ -572,22 +581,6 @@ class GameOver extends Phaser.Scene {
 		super("GameOver");
 	}
 
-	preload() {
-		this.pieces = [
-			"SignalLostTxt1",
-			"SignalLost_Astronaut",
-			"SignalLostTxt2",
-			"SignalLost_Astronaut_Line",
-			"TryAgainButton",
-		];
-
-		this.load.setPath("assets/UI/SignalLost");
-		this.load.image("SignalLostBg");
-		this.load.image(this.pieces);
-
-		this.objects = [];
-	}
-
 	init(level) {
 		this.level = level;
 	}
@@ -661,6 +654,9 @@ class HUD extends Phaser.Scene {
 	preload() {
 		this.load.setPath("assets/UI");
 		this.load.image(["Button_Music_ON", "Button_Music_OFF"]);
+
+		this.load.setPath("assets/Audio");
+		this.load.audio("music", "Music/Stage3.mp3");
 	}
 
 	create() {
@@ -669,11 +665,11 @@ class HUD extends Phaser.Scene {
 		button.setInteractive();
 		button.on("pointerdown", () => {
 			button.setTexture("Button_Music_" + (this.sound.mute ? "ON" : "OFF"));
-			this.sound.mute = !this.sound.mute;
 			if (!this.musicStarted) {
 				this.sound.play("music", {loop: true});
 				this.musicStarted = true;
 			}
+			this.sound.mute = !this.sound.mute;
 		});
 
 		this.sound.mute = true;
