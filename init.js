@@ -1,6 +1,6 @@
 new Phaser.Game({
 	title: "Space Buddies",
-	url: "The URL of our game!",
+	url: "https://latcarf.itch.io/space-buddies",
 	type: Phaser.AUTO,
 	transparent: true,
 	scale: {

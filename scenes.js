@@ -55,8 +55,6 @@ class StartScene extends Phaser.Scene {
 		this.loadPNGSequence("RobotHandGrab", 4);
 		this.load.setPath("assets/Robot/RobotHandStart");
 		this.loadPNGSequence("RobotHandStart", 5);
-		this.load.setPath("assets/Robot/RobotShot");
-		this.loadPNGSequence("RobotShot", 13);
 		this.load.setPath("assets/Robot/RobotLaser");
 		this.loadPNGSequence("RobotLaser", 3);
 		this.load.setPath("assets/Robot/RobotLaserEyes");
@@ -105,12 +103,17 @@ class StartScene extends Phaser.Scene {
 		this.load.audio("explosion", "Fx/Explosion 1.mp3");
 		this.load.audio("hit", "Robot/RobotPowerDown.mp3");
 		this.load.audio("shield", "PowerUps/PickUp.mp3");
+
+		this.load.setPath("assets/SpriteSheets");
+		this.load.atlas("RobotShot", "RobotShot.png", "RobotShot.json");
 	}
 
 	create() {
 		this.add.image(0, 0, "StartScreen").setOrigin(0, 0);
 		let startButton = this.add.image(this.scale.width / 2, conf.startButtonY, "StartButton");
 		startButton.isDown = false;
+
+		this.anims.create({key: "RobotShot", frames: "RobotShot"});
 
 		startButton.setInteractive();
 		startButton.on("pointerdown", () => {
@@ -151,8 +154,6 @@ class StartScene extends Phaser.Scene {
 class MainScene extends Phaser.Scene {
 	constructor() {
 		super("MainScene");
-
-		window.scene = this;
 	}
 
 	init(level) {
@@ -250,7 +251,6 @@ class MainScene extends Phaser.Scene {
 		this.createPNGSequence("RobotEyes", 24, {frameRate: 15});
 		this.createPNGSequence("RobotHandGrab", 4);
 		this.createPNGSequence("RobotHandStart", 5);
-		this.createPNGSequence("RobotShot", 13, {repeat: -1});
 		this.createPNGSequence("RobotLaserEyes", 10, {repeat: -1});
 		this.createPNGSequence("RobotLaser", 3);
 
@@ -668,7 +668,6 @@ class GameOver extends Phaser.Scene {
 class HUD extends Phaser.Scene {
 	constructor() {
 		super({key: "HUD", active: true});
-		this.musicStarted = false;
 	}
 
 	preload() {
@@ -680,18 +679,15 @@ class HUD extends Phaser.Scene {
 	}
 
 	create() {
-		let button = this.add.image(980, 100, "Button_Music_OFF");
+		this.sound.mute = false;
+		this.sound.play("music", {loop: true});
+
+		let button = this.add.image(980, 100, "Button_Music_ON");
 
 		button.setInteractive();
 		button.on("pointerdown", () => {
-			button.setTexture("Button_Music_" + (this.sound.mute ? "ON" : "OFF"));
-			if (!this.musicStarted) {
-				this.sound.play("music", {loop: true});
-				this.musicStarted = true;
-			}
 			this.sound.mute = !this.sound.mute;
+			button.setTexture("Button_Music_" + (this.sound.mute ? "ON" : "OFF"));
 		});
-
-		this.sound.mute = true;
 	}
 }
