@@ -113,7 +113,7 @@ class StartScene extends Phaser.Scene {
 		let startButton = this.add.image(this.scale.width / 2, conf.startButtonY, "StartButton");
 		startButton.isDown = false;
 
-		this.anims.create({key: "RobotShot", frames: "RobotShot", frameRate: 20});
+		this.anims.create({key: "RobotShot", frames: "RobotShot", frameRate: 15});
 
 		startButton.setInteractive();
 		startButton.on("pointerdown", () => {
