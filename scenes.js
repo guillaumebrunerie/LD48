@@ -1,6 +1,8 @@
 class StartScene extends Phaser.Scene {
 	constructor() {
 		super("StartScene");
+
+		window.scene = this;
 	}
 
 	loadPNGSequence(name, duration) {
@@ -55,8 +57,6 @@ class StartScene extends Phaser.Scene {
 		this.loadPNGSequence("RobotHandGrab", 4);
 		this.load.setPath("assets/Robot/RobotHandStart");
 		this.loadPNGSequence("RobotHandStart", 5);
-		this.load.setPath("assets/Robot/RobotLaser");
-		this.loadPNGSequence("RobotLaser", 3);
 		this.load.setPath("assets/Robot/RobotLaserEyes");
 		this.loadPNGSequence("RobotLaserEyes", 10);
 
@@ -106,6 +106,7 @@ class StartScene extends Phaser.Scene {
 
 		this.load.setPath("assets/SpriteSheets");
 		this.load.atlas("RobotShot", "RobotShot.png", "RobotShot.json");
+		this.load.atlas("RobotLaser", "RobotLaser.png", "RobotLaser.json");
 	}
 
 	create() {
@@ -113,7 +114,22 @@ class StartScene extends Phaser.Scene {
 		let startButton = this.add.image(this.scale.width / 2, conf.startButtonY, "StartButton");
 		startButton.isDown = false;
 
-		this.anims.create({key: "RobotShot", frames: "RobotShot", frameRate: 15});
+		this.anims.create({key: "RobotShot", frames: "RobotShot", frameRate: 10});
+
+		let createClip = (key, clip, props) => {
+			let isFrame = s => s.startsWith(key + clip);
+			let frameNames =
+				this.textures.get(key).getFrameNames().filter(isFrame).sort();
+			let frames = frameNames.map(frame => ({key, frame}));
+			let config = {key: key + clip, frames, frameRate: 20};
+			this.anims.create(Object.assign(config, props));
+		};
+
+		createClip("RobotLaser", "Start");
+		createClip("RobotLaser", "Loop", {repeat: -1});
+		createClip("RobotLaser", "End");
+
+		// this.anims.create({key: "RobotLaserStart", frames: "RobotLaser", frameRate: 15});
 
 		startButton.setInteractive();
 		startButton.on("pointerdown", () => {
@@ -252,7 +268,6 @@ class MainScene extends Phaser.Scene {
 		this.createPNGSequence("RobotHandGrab", 4);
 		this.createPNGSequence("RobotHandStart", 5);
 		this.createPNGSequence("RobotLaserEyes", 10, {repeat: -1});
-		this.createPNGSequence("RobotLaser", 3);
 
 		this.robot = new Robot(this);
 		this.add.existing(this.robot);

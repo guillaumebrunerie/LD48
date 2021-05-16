@@ -4,9 +4,9 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 	constructor(scene, data) {
 		super(scene, Math.random() * scene.scale.width, scene.scale.height, data.name);
 		this.rotation = Math.random() * Math.PI*2;
-		this.y = this.y + this.getBounds().height / 2;
 		this.type = data.name;
 		this.scale = rand(data.scale);
+		this.y = this.y + this.getBounds().height / 2;
 		this.isPulledBack = false;
 
 		this.speedX = rand(data.speedX);
@@ -187,6 +187,7 @@ class Robot extends Phaser.GameObjects.Container {
 
 		this.laser = scene.add.sprite(0, conf.headOriginY + conf.laserY, "RobotLaser")
 			.setOrigin(0.5, 0)
+			.setScale(4)
 			.setVisible(false);
 		this.weaponContainer.add(this.laser);
 
@@ -285,8 +286,16 @@ class Robot extends Phaser.GameObjects.Container {
 	up(weapon) {
 		if (!this.isLasering || weapon == "hand")
 			this.fire(weapon);
-		this.isLasering = false;
-		this.laser.visible = false;
+		if (this.isLasering) {
+			// this.isLasering = false;
+			// this.laser.visible = false;
+			// this.scene.add.sprite(this.laser);
+			this.laser.play("RobotLaserEnd")
+				.once("animationcomplete", () => {
+					this.isLasering = false;
+					this.laser.visible = false;
+				});
+		}
 		this.shootingRange.visible = false;
 		this.weaponContainer.rotation = 0;
 		this.charging = false;
@@ -319,7 +328,8 @@ class Robot extends Phaser.GameObjects.Container {
 		// laserC.add(laser);
 		this.scene.sound.play("laser");
 		this.laser.visible = true;
-		this.laser.play("RobotLaser");
+		this.laser.play("RobotLaserStart")
+			.once("animationcomplete", () => this.laser.play("RobotLaserLoop"));
 		this.isLasering = true;
 		this.scene.cameras.main.shake(200, 0.01);
 		this.hasLaser = false;
@@ -333,6 +343,7 @@ class Robot extends Phaser.GameObjects.Container {
 class Bullet extends Phaser.GameObjects.Sprite {
 	constructor (scene, x, y, angle) {
 		super(scene, x, y, "RobotShot");
+		this.originY = conf.bulletOriginY;
 		this.rotation = angle - Math.PI/2;
 		let speed = rand(conf.bulletSpeed);
 		this.speedX = speed * Math.cos(angle);
@@ -348,7 +359,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
 		this.x += this.speedX * delta;
 		this.y += this.speedY * delta;
 
-		if (this.y > this.scene.scale.height)
+		if (this.y > this.scene.scale.height * 2)
 			this.destroy();
 	}
 }

@@ -43,6 +43,7 @@ conf.shootingRangeAdjustment = 1500;
 conf.bulletSpeed = 2;
 conf.reloadDelay = 0;
 conf.bulletScale = 1.4;
+conf.bulletOriginY = 0.9;
 
 // Laser
 conf.laserY = -65;
