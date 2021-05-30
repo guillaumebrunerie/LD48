@@ -1,0 +1,244 @@
+
+Astronaut.png
+size: 888,521
+format: RGBA8888
+filter: Linear,Linear
+repeat: none
+AirSuitFx_000
+  rotate: true
+  xy: 162, 23
+  size: 108, 145
+  orig: 200, 200
+  offset: 49, 47
+  index: -1
+AirSuitFx_001
+  rotate: true
+  xy: 2, 2
+  size: 129, 158
+  orig: 200, 200
+  offset: 37, 34
+  index: -1
+AirSuitFx_002
+  rotate: true
+  xy: 693, 20
+  size: 136, 165
+  orig: 200, 200
+  offset: 36, 27
+  index: -1
+AirSuitFx_003
+  rotate: false
+  xy: 648, 158
+  size: 146, 177
+  orig: 200, 200
+  offset: 28, 15
+  index: -1
+AirSuitFx_004
+  rotate: false
+  xy: 487, 145
+  size: 159, 183
+  orig: 200, 200
+  offset: 20, 9
+  index: -1
+AirSuitFx_005
+  rotate: false
+  xy: 160, 133
+  size: 151, 192
+  orig: 200, 200
+  offset: 24, 0
+  index: -1
+AirSuitFx_006
+  rotate: false
+  xy: 2, 327
+  size: 157, 192
+  orig: 200, 200
+  offset: 22, 0
+  index: -1
+AirSuitFx_007
+  rotate: false
+  xy: 497, 337
+  size: 172, 182
+  orig: 200, 200
+  offset: 18, 10
+  index: -1
+AirSuitFx_008
+  rotate: false
+  xy: 331, 330
+  size: 164, 189
+  orig: 200, 200
+  offset: 27, 3
+  index: -1
+AirSuitFx_009
+  rotate: false
+  xy: 2, 133
+  size: 156, 192
+  orig: 200, 200
+  offset: 23, 0
+  index: -1
+AirSuitFx_010
+  rotate: false
+  xy: 161, 328
+  size: 168, 191
+  orig: 200, 200
+  offset: 19, 0
+  index: -1
+AirSuitFx_011
+  rotate: false
+  xy: 313, 137
+  size: 172, 189
+  orig: 200, 200
+  offset: 16, 3
+  index: -1
+Arm_L
+  rotate: true
+  xy: 718, 464
+  size: 55, 41
+  orig: 55, 41
+  offset: 0, 0
+  index: -1
+Arm_R
+  rotate: true
+  xy: 671, 460
+  size: 59, 45
+  orig: 59, 45
+  offset: 0, 0
+  index: -1
+Body
+  rotate: false
+  xy: 521, 5
+  size: 170, 138
+  orig: 170, 138
+  offset: 0, 0
+  index: -1
+Eyebrow_L
+  rotate: true
+  xy: 296, 10
+  size: 11, 10
+  orig: 11, 10
+  offset: 0, 0
+  index: -1
+Eyebrow_R
+  rotate: true
+  xy: 273, 8
+  size: 13, 11
+  orig: 13, 11
+  offset: 0, 0
+  index: -1
+Eyes
+  rotate: true
+  xy: 286, 8
+  size: 13, 8
+  orig: 13, 8
+  offset: 0, 0
+  index: -1
+Hand_L
+  rotate: true
+  xy: 850, 303
+  size: 42, 36
+  orig: 42, 36
+  offset: 0, 0
+  index: -1
+Hand_R
+  rotate: true
+  xy: 850, 261
+  size: 40, 35
+  orig: 40, 35
+  offset: 0, 0
+  index: -1
+Head
+  rotate: true
+  xy: 796, 452
+  size: 67, 90
+  orig: 67, 90
+  offset: 0, 0
+  index: -1
+Helmet_BACK
+  rotate: false
+  xy: 309, 26
+  size: 104, 105
+  orig: 104, 105
+  offset: 0, 0
+  index: -1
+Helmet_BACK_HOLE
+  rotate: false
+  xy: 415, 30
+  size: 104, 105
+  orig: 104, 105
+  offset: 0, 0
+  index: -1
+Helmet_Back_Part
+  rotate: false
+  xy: 796, 201
+  size: 51, 51
+  orig: 51, 51
+  offset: 0, 0
+  index: -1
+Helmet_TOP
+  rotate: true
+  xy: 671, 347
+  size: 103, 95
+  orig: 103, 95
+  offset: 0, 0
+  index: -1
+Helmet_TOP_HOLE
+  rotate: true
+  xy: 768, 347
+  size: 103, 95
+  orig: 103, 95
+  offset: 0, 0
+  index: -1
+Helmet_TOP_Part
+  rotate: true
+  xy: 796, 298
+  size: 47, 52
+  orig: 47, 52
+  offset: 0, 0
+  index: -1
+Hole
+  rotate: true
+  xy: 796, 254
+  size: 42, 52
+  orig: 42, 52
+  offset: 0, 0
+  index: -1
+Mouth_A
+  rotate: false
+  xy: 415, 3
+  size: 25, 25
+  orig: 25, 25
+  offset: 0, 0
+  index: -1
+Mouth_Default
+  rotate: false
+  xy: 190, 3
+  size: 22, 18
+  orig: 22, 18
+  offset: 0, 0
+  index: -1
+Mouth_E
+  rotate: false
+  xy: 214, 5
+  size: 24, 16
+  orig: 24, 16
+  offset: 0, 0
+  index: -1
+Mouth_M
+  rotate: false
+  xy: 162, 3
+  size: 26, 18
+  orig: 26, 18
+  offset: 0, 0
+  index: -1
+Mouth_U
+  rotate: false
+  xy: 257, 5
+  size: 14, 16
+  orig: 14, 16
+  offset: 0, 0
+  index: -1
+Mouth_W
+  rotate: false
+  xy: 240, 5
+  size: 15, 16
+  orig: 15, 16
+  offset: 0, 0
+  index: -1
