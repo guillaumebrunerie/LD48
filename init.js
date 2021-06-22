@@ -9,5 +9,10 @@ new Phaser.Game({
 		width: 1080,
 		height: 1920,
 	},
+	plugins: {
+		scene: [
+			{ key: 'SpinePlugin', plugin: window.SpinePlugin, mapping: 'spine' }
+		]
+	},
 	scene: [StartScene, MainScene, GameOver, LevelComplete, GameComplete, HUD],
 });

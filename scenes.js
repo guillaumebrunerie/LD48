@@ -32,6 +32,10 @@ class StartScene extends Phaser.Scene {
 		this.load.image("Astronaut_Line", "Astronaut/Astronaut_Line.png");
 		this.load.image("ShieldBubble", "Fx/ShieldBubble.png");
 
+		this.load.setPath("assets/Astronaut/Spine");
+		this.load.spine("Astronaut", 'Astronaut.json', [ 'Astronaut.atlas' ], false);
+		// Death, Death2, Happy, Happy2, Idle, Hit
+
 		this.load.setPath("assets/Fx/ExplosionDefault");
 		this.loadPNGSequence("ExplosionDefault", 6);
 
@@ -245,7 +249,11 @@ class MainScene extends Phaser.Scene {
 
 		// Astronaut
 		this.add.image(this.scale.width / 2, conf.lineY, "Astronaut_Line");
-		this.astronaut = this.add.image(this.scale.width / 2, conf.astronautY, "Astronaut");
+
+		this.astronaut = this.add.spine(this.scale.width / 2, conf.astronautY, 'Astronaut');
+		this.astronaut.setAnimation(1, "Idle", true);
+		const container = this.add.spineContainer();
+		container.add(this.astronaut);
 
 		this.createPNGSequence("ShieldBubbleStart", 15);
 		this.createPNGSequence("ShieldBubbleEnd", 3);
@@ -381,6 +389,8 @@ class MainScene extends Phaser.Scene {
 		let y = conf.screwY;
 		this.screwContainer.add(this.add.image(x, y, "UI_Screw"));
 		this.collectedScrews++;
+		this.astronaut.setAnimation(1, Math.random() > 0.5 ? "Happy" : "Happy2");
+		this.astronaut.addAnimation(1, "Idle", true);
 
 		if (this.collectedScrews == 3)
 			this.win();
@@ -404,6 +414,8 @@ class MainScene extends Phaser.Scene {
 			default:
 				return;
 		}
+		this.astronaut.setAnimation(1, "Hit");
+		this.astronaut.addAnimation(1, "Idle", true);
 		shield.play("ShieldBubbleEnd").once("animationcomplete", () => shield.visible = false);
 		this.shieldLevel--;
 		window.navigator.vibrate && window.navigator.vibrate(50);
@@ -485,7 +497,7 @@ class MainScene extends Phaser.Scene {
 			let shieldSize;
 			switch (this.shieldLevel) {
 				case 0:
-					shieldSize = (this.astronaut.getBounds().width + this.astronaut.getBounds().height) / 4;
+					shieldSize = 250 * 1 / 2;
 					break;
 				case 1:
 					shieldSize = 250 * 1.5 / 2;
@@ -523,8 +535,25 @@ class MainScene extends Phaser.Scene {
 	gameOver() {
 		this.isFinished = true;
 		window.navigator.vibrate && window.navigator.vibrate(200);
-		this.cameras.main.fade(500);
-		this.time.delayedCall(500, () => this.scene.start("GameOver", this.level));
+		this.time.delayedCall(2000, () => this.cameras.main.fade(500));
+		this.time.delayedCall(2500, () => this.scene.start("GameOver", this.level));
+		let animation, dx, dy;
+		if (Math.random() > 0.5) {
+			animation = "Death";
+			dx = -500;
+			dy = -500;
+		} else {
+			animation = "Death2";
+			dx = -750;
+			dy = 1500;
+		}
+		this.astronaut.setAnimation(1, animation);
+		this.tweens.add({
+			targets: this.astronaut,
+			x: this.astronaut.x + dx,
+			y: this.astronaut.y + dy,
+			duration: 2000,
+		});
 	}
 
 	win() {
