@@ -185,11 +185,7 @@ class Robot extends Phaser.GameObjects.Container {
 		this.shootingRange.visible = false;
 		this.weaponContainer.add(this.shootingRange);
 
-		this.laser = scene.add.sprite(0, conf.headOriginY + conf.laserY, "RobotLaser")
-			.setOrigin(0.5, 0)
-			.setScale(4)
-			.setVisible(false);
-		this.weaponContainer.add(this.laser);
+		this.createLaser();
 
 		// Track where the robot is
 		this.centerY = conf.robotY - conf.robotRadius;
@@ -206,6 +202,15 @@ class Robot extends Phaser.GameObjects.Container {
 		this.charging = false;
 		this.chargingLevel = 0;
 		this.hasLaser = false;
+
+	}
+
+	createLaser() {
+		this.laser = this.scene.add.sprite(0, conf.headOriginY + conf.laserY, "RobotLaser")
+			.setOrigin(0.5, 0)
+			.setScale(4)
+			.setVisible(false);
+		this.weaponContainer.add(this.laser);
 	}
 
 	update(time, delta) {
@@ -287,13 +292,16 @@ class Robot extends Phaser.GameObjects.Container {
 		if (!this.isLasering || weapon == "hand")
 			this.fire(weapon);
 		if (this.isLasering) {
-			// this.isLasering = false;
-			// this.laser.visible = false;
-			// this.scene.add.sprite(this.laser);
+			this.isLasering = false;
+			let matrix = this.laser.getWorldTransformMatrix();
+			this.weaponContainer.remove(this.laser);
+			this.laser.setPosition(matrix.tx, matrix.ty);
+			this.laser.setRotation(matrix.rotation);
+			this.laser.setScale(matrix.scaleX, matrix.scaleY);
 			this.laser.play("RobotLaserEnd")
 				.once("animationcomplete", () => {
-					this.isLasering = false;
-					this.laser.visible = false;
+					this.laser.destroy();
+					this.createLaser();
 				});
 		}
 		this.shootingRange.visible = false;
