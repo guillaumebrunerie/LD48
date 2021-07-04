@@ -108,6 +108,13 @@ class StartScene extends Phaser.Scene {
 		this.load.audio("hit", "Robot/RobotPowerDown.mp3");
 		this.load.audio("shield", "PowerUps/PickUp.mp3");
 
+		this.load.audio("AstronautHit", "Astronaut/Hit.mp3");
+		this.load.audio("AstronautHappy", "Astronaut/Happy.mp3");
+		this.load.audio("AstronautHappy2", "Astronaut/Happy2.mp3");
+		this.load.audio("AstronautDeath", "Astronaut/Death.mp3");
+		this.load.audio("AstronautDeath2", "Astronaut/Death2.mp3");
+		this.load.audio("AstronautAirLeak", "Astronaut/Death_AirLeak.mp3");
+
 		this.load.setPath("assets/SpriteSheets");
 		this.load.atlas("RobotShot", "RobotShot.png", "RobotShot.json");
 		this.load.atlas("RobotLaser", "RobotLaser.png", "RobotLaser.json");
@@ -389,7 +396,13 @@ class MainScene extends Phaser.Scene {
 		let y = conf.screwY;
 		this.screwContainer.add(this.add.image(x, y, "UI_Screw"));
 		this.collectedScrews++;
-		this.astronaut.setAnimation(1, Math.random() > 0.5 ? "Happy" : "Happy2");
+		if (Math.random() > 0.5) {
+			this.astronaut.setAnimation(1, "Happy");
+			this.time.delayedCall(300, () => this.sound.play("AstronautHappy"));
+		} else {
+			this.astronaut.setAnimation(1, "Happy2");
+			this.sound.play("AstronautHappy2");
+		}
 		this.astronaut.addAnimation(1, "Idle", true);
 
 		if (this.collectedScrews == 3)
@@ -414,6 +427,7 @@ class MainScene extends Phaser.Scene {
 			default:
 				return;
 		}
+		this.time.delayedCall(100, () => this.sound.play("AstronautHit"));
 		this.astronaut.setAnimation(1, "Hit");
 		this.astronaut.addAnimation(1, "Idle", true);
 		shield.play("ShieldBubbleEnd").once("animationcomplete", () => shield.visible = false);
@@ -542,10 +556,14 @@ class MainScene extends Phaser.Scene {
 			animation = "Death";
 			dx = -500;
 			dy = -500;
+			this.time.delayedCall(100, () => this.sound.play("AstronautAirLeak"));
+			this.time.delayedCall(167, () => this.sound.play("AstronautDeath"));
 		} else {
 			animation = "Death2";
 			dx = -750;
 			dy = 1500;
+			this.time.delayedCall(67, () => this.sound.play("AstronautAirLeak"));
+			this.time.delayedCall(133, () => this.sound.play("AstronautDeath2"));
 		}
 		this.astronaut.setAnimation(1, animation);
 		this.tweens.add({
