@@ -34,7 +34,7 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 			else
 				this.collect();
 		}
-		if (this.y < 0)
+		if (this.y < -this.getBounds().height / 2)
 			this.destroy();
 	}
 
