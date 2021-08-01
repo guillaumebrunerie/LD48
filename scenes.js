@@ -346,7 +346,7 @@ class MainScene extends Phaser.Scene {
 			return;
 
 		this.robot.move(this.getWeaponFromEvent(e));
-		let adjustment = conf.shootingRangeAdjustment / (this.robot.hasLaser ? 2 : 1);
+		let adjustment = conf.shootingRangeAdjustment / 1.5;
 		this.robot.weaponContainer.rotation = (this.downPosition.x - e.position.x) / adjustment;
 		this.updateUI(e);
 	}
