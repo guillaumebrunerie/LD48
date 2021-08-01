@@ -6,7 +6,12 @@ class DriftingThing extends Phaser.GameObjects.Sprite {
 		this.rotation = Math.random() * Math.PI*2;
 		this.type = data.name;
 		this.scale = rand(data.scale);
-		this.y = this.y + this.getBounds().height / 2;
+
+		let height = this.getBounds().height;
+		// Workaround for getBounds not working for the animated TV
+		if (data.name == "ObstacleTV")
+			height = 300;
+		this.y = this.y + height / 2;
 		this.isPulledBack = false;
 
 		this.speedX = rand(data.speedX);
@@ -367,7 +372,7 @@ class Bullet extends Phaser.GameObjects.Sprite {
 		this.x += this.speedX * delta;
 		this.y += this.speedY * delta;
 
-		if (this.y > this.scene.scale.height * 2)
+		if (this.y > this.scene.scale.height + 100)
 			this.destroy();
 	}
 }
