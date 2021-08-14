@@ -20,7 +20,7 @@ conf.uiYSwitch = 300;
 
 // The astronaut
 conf.lineY = 120;
-conf.astronautY = 240;
+conf.astronautY = 250;
 
 // The robot
 conf.robotSpeed = 2;

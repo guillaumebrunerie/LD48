@@ -4,7 +4,7 @@ new Phaser.Game({
 	type: Phaser.AUTO,
 	transparent: true,
 	scale: {
-		autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
+		autoCenter: Phaser.Scale.CENTER_BOTH,
 		mode: Phaser.Scale.FIT,
 		width: 1080,
 		height: 1920,
